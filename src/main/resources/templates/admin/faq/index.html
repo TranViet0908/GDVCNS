@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{layouts/dashboard/head :: head}"></head>
+
+<body>
+<nav th:replace="~{layouts/dashboard/sidebar :: nav}"></nav>
+
+<div class="layout-container">
+
+  <header th:replace="~{layouts/dashboard/header :: header}"></header>
+
+  <main class="main-content">
+    <div class="content-header d-flex justify-content-between align-items-center">
+      <div>
+        <h1 class="page-title">Quản lý FAQ</h1>
+        <p class="page-subtitle">Danh sách câu hỏi thường gặp</p>
+      </div>
+      <a th:href="@{/admin/faqs/add}" class="btn btn-primary">
+        <i class="fas fa-plus"></i> Thêm mới
+      </a>
+    </div>
+
+    <div class="card mb-4">
+      <div class="card-body">
+        <form th:action="@{/admin/faqs}" method="get" class="row g-3 align-items-center">
+          <div class="col-md-10">
+            <div class="input-group">
+              <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
+              <input type="text" class="form-control" name="keyword"
+                     th:value="${keyword}" placeholder="Nhập từ khóa tìm kiếm...">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="card">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover mb-0">
+            <thead>
+            <tr>
+              <th style="width: 5%">STT</th>
+              <th style="width: 30%">Câu hỏi</th>
+              <th style="width: 35%">Câu trả lời</th>
+              <th style="width: 10%" class="text-center">Thứ tự</th>
+              <th style="width: 10%" class="text-center">Trạng thái</th>
+              <th style="width: 10%" class="text-center">Hành động</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="faq, iter : ${faqs}">
+              <td th:text="${iter.count}">1</td>
+              <td class="fw-bold" th:text="${faq.question}">Question?</td>
+              <td class="text-muted small" th:utext="${#strings.abbreviate(faq.answer, 80)}">Answer...</td>
+              <td class="text-center">
+                <span class="badge bg-light text-dark border" th:text="${faq.orderIndex}">1</span>
+              </td>
+              <td class="text-center">
+                <span th:if="${faq.isActive}" class="badge badge-status-published">Hiển thị</span>
+                <span th:unless="${faq.isActive}" class="badge badge-status-draft">Ẩn</span>
+              </td>
+              <td class="text-center">
+                <a th:href="@{/admin/faqs/edit/{id}(id=${faq.id})}" class="btn btn-info btn-sm text-white" title="Sửa">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <a th:href="@{/admin/faqs/delete/{id}(id=${faq.id})}"
+                   class="btn btn-danger btn-sm"
+                   onclick="return confirm('Bạn có chắc chắn muốn xóa?');" title="Xóa">
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+            <tr th:if="${faqs.empty}">
+              <td colspan="6" class="text-center py-5 text-muted">
+                <i class="fas fa-folder-open fa-3x mb-3 text-gray-300"></i><br>
+                Không tìm thấy dữ liệu nào phù hợp.
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div th:replace="~{layouts/dashboard/scripts :: scripts}"></div>
+</body>
+</html>

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title">Chi tiết Khóa học</h1>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb mb-0">
+                            <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a th:href="@{/admin/courses}">Khóa học</a></li>
+                            <li class="breadcrumb-item active" th:text="${course.name}">Tên khóa</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="d-flex gap-2">
+                    <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Chỉnh sửa
+                    </a>
+                    <a th:href="@{/admin/courses}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Quay lại
+                    </a>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">Nội dung khóa học</h5>
+                        </div>
+                        <div class="card-body">
+                            <h2 class="mb-3" th:text="${course.name}">Tên khóa học</h2>
+
+                            <div class="mb-4">
+                                <h6 class="text-muted text-uppercase small fw-bold">Mô tả ngắn</h6>
+                                <p class="lead fs-6" th:text="${course.summary}">Mô tả ngắn...</p>
+                            </div>
+
+                            <hr>
+
+                            <div>
+                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Nội dung chi tiết</h6>
+                                <div class="editor-content" th:utext="${course.content}">
+                                    Nội dung bài viết sẽ hiển thị ở đây...
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">Ảnh đại diện</h5>
+                        </div>
+                        <div class="card-body text-center">
+                            <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : 'https://via.placeholder.com/300x200'}"
+                                 class="img-fluid rounded border"
+                                 style="max-height: 250px; width: 100%; object-fit: cover;" alt="Thumbnail">
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">Thông tin chi tiết</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span class="text-muted">Trạng thái</span>
+                                    <span th:if="${course.isActive}" class="badge badge-status-published">Đang hoạt động</span>
+                                    <span th:unless="${course.isActive}" class="badge badge-status-hidden">Đang ẩn</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span class="text-muted">Danh mục</span>
+                                    <span class="fw-medium" th:text="${course.categoryName != null ? course.categoryName : 'Chưa phân loại'}">--</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span class="text-muted">Slug</span>
+                                    <code class="text-primary" th:text="${course.slug}">slug-name</code>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span class="text-muted">Thời lượng</span>
+                                    <span class="fw-medium" th:text="${course.duration}">--</span>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                    <span class="text-muted">Hình thức</span>
+                                    <span class="badge bg-info text-dark" th:text="${course.trainingFormat}">--</span>
+                                </li>
+                                <li class="list-group-item px-0">
+                                    <span class="text-muted d-block mb-1">Đối tượng tham gia</span>
+                                    <span class="fw-medium" th:text="${course.targetAudience}">--</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header bg-light">
+                            <h5 class="card-title mb-0">Hệ thống</h5>
+                        </div>
+                        <div class="card-body text-sm">
+                            <div class="mb-2">
+                                <span class="text-muted">Ngày tạo:</span><br>
+                                <span class="fw-medium" th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy HH:mm')}">--</span>
+                            </div>
+                            <div class="mb-2">
+                                <span class="text-muted">Lượt xem:</span><br>
+                                <span class="fw-medium" th:text="${course.viewCount}">0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+</body>
+</html>

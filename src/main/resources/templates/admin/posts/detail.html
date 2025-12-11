@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <a th:href="@{/admin/posts}" class="btn btn-outline-secondary mb-2">
+                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                    </a>
+                    <h1 class="page-title">Chi tiết bài viết</h1>
+                </div>
+
+                <div class="btn-group">
+                    <a th:if="${isAdmin or post.authorId == currentUserId}"
+                       th:href="@{/admin/posts/{id}/edit(id=${post.id})}"
+                       class="btn btn-warning">
+                        <i class="fas fa-edit"></i> Chỉnh sửa
+                    </a>
+
+                    <a th:if="${isAdmin or post.authorId == currentUserId}"
+                       th:href="@{/admin/posts/{id}/delete(id=${post.id})}"
+                       class="btn btn-danger"
+                       onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này?')">
+                        <i class="fas fa-trash"></i> Xóa
+                    </a>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-3 border-end">
+                            <small class="text-muted d-block">Trạng thái</small>
+                            <span class="badge mt-1"
+                                  th:classappend="${
+                                        post.status.name() == 'PUBLISHED' ? 'bg-success' :
+                                        (post.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-secondary')
+                                      }"
+                                  th:text="${post.status}">PUBLISHED</span>
+                        </div>
+                        <div class="col-md-3 border-end">
+                            <small class="text-muted d-block">Tác giả</small>
+                            <strong th:text="${post.authorName}">Admin</strong>
+                        </div>
+                        <div class="col-md-3 border-end">
+                            <small class="text-muted d-block">Danh mục</small>
+                            <strong th:text="${post.categoryName}">Tin tức</strong>
+                        </div>
+                        <div class="col-md-3">
+                            <small class="text-muted d-block">Ngày đăng</small>
+                            <span th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card shadow-sm">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0"><i class="fas fa-desktop"></i> Xem trước hiển thị (Preview)</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="public-preview-container" style="max-width: 900px; margin: 0 auto; padding: 40px 20px;">
+
+                        <div class="mb-4 text-center" th:if="${post.thumbnailUrl != null}">
+                            <img th:src="${post.thumbnailUrl}" alt="Thumbnail" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+                        </div>
+
+                        <h1 class="mb-3 fw-bold text-dark" style="font-size: 2.5rem; line-height: 1.3;" th:text="${post.title}">Tiêu đề bài viết</h1>
+
+                        <div class="mb-4 text-muted">
+                            <span class="me-3"><i class="far fa-clock"></i> <span th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}"></span></span>
+                            <span class="me-3"><i class="far fa-user"></i> <span th:text="${post.authorName}"></span></span>
+                            <span><i class="far fa-folder"></i> <span th:text="${post.categoryName}"></span></span>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-light border-start border-4 border-primary fst-italic text-secondary">
+                            <strong class="text-dark">Tóm tắt: </strong>
+                            <span th:text="${post.summary}">Nội dung tóm tắt...</span>
+                        </div>
+
+                        <hr>
+
+                        <div class="post-content mt-4" th:utext="${post.content}">
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<style>
+    /* CSS cho phần nội dung bài viết để ảnh không bị tràn */
+    .post-content img {
+        max-width: 100%;
+        height: auto !important;
+        border-radius: 4px;
+        margin: 10px 0;
+    }
+    .post-content iframe {
+        max-width: 100%;
+        margin: 10px 0;
+    }
+    .post-content h2 { margin-top: 1.5rem; font-weight: bold; }
+    .post-content h3 { margin-top: 1.2rem; font-weight: bold; }
+    .post-content p { line-height: 1.6; margin-bottom: 1rem; font-size: 1.1rem; color: #333; }
+    .post-content ul, .post-content ol { margin-bottom: 1rem; padding-left: 20px; }
+</style>
+</body>
+</html>

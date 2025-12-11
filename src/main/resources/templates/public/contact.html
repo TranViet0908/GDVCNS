@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center" style="margin-bottom: 0 !important;">
+    <div class="container animate__animated animate__fadeInDown">
+        <h1 class="fw-bold display-4 mb-3">Liên Hệ</h1>
+        <p class="lead text-white-50">Kết nối với chúng tôi để được tư vấn giải pháp tốt nhất</p>
+    </div>
+</section>
+
+<section class="section-contact-fix bg-light-section">
+    <div class="container">
+        <div class="card border-0 shadow-lg card-contact-radius-fix animate-on-scroll">
+            <div class="row g-0 contact-row-equal">
+
+                <div class="col-lg-8 bg-white p-5">
+                    <h3 class="fw-bold mb-2 text-primary">Gửi lời nhắn</h3>
+                    <p class="text-muted mb-4">Để lại thông tin, đội ngũ GDVCNS sẽ liên hệ lại ngay.</p>
+
+                    <form method="POST" th:action="@{/lien-he}">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="fullName" class="form-label fw-bold small text-muted">Họ tên</label>
+                                <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Nguyễn Văn A" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="phone" class="form-label fw-bold small text-muted">Điện thoại</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" placeholder="09xxxxxxx" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="email" class="form-label fw-bold small text-muted">Email</label>
+                                <input type="email" class="form-control" id="email" name="email" placeholder="example@gmail.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="subject" class="form-label fw-bold small text-muted">Chủ đề</label>
+                                <input type="text" class="form-control" id="subject" name="subject"
+                                       th:value="${param.subject}" placeholder="Bạn cần tư vấn gì?" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="message" class="form-label fw-bold small text-muted">Nội dung</label>
+                                <textarea class="form-control" id="message" name="message" rows="4" placeholder="Chi tiết yêu cầu..." required></textarea>
+                            </div>
+                            <div class="col-12 mt-4">
+                                <button type="submit" class="btn btn-modern btn-primary-modern w-100 py-3 text-uppercase fw-bold">
+                                    <i class="fas fa-paper-plane me-2"></i> Gửi Yêu Cầu
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="contact-info-wrapper-fix d-flex flex-column justify-content-center h-100">
+                        <h4 class="fw-bold mb-4 text-white">Thông tin liên hệ</h4>
+
+                        <div class="contact-info-item d-flex align-items-start mb-4">
+                            <div class="icon-box bg-white bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+                                <i class="fas fa-map-marker-alt text-accent fs-6"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-accent mb-1 small text-uppercase">Trụ sở chính</h6>
+                                <p class="mb-0 text-white-50 small" th:text="${siteAddress}">Hà Nội</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item d-flex align-items-start mb-4">
+                            <div class="icon-box bg-white bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+                                <i class="fas fa-phone-alt text-accent fs-6"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-accent mb-1 small text-uppercase">Hotline</h6>
+                                <p class="mb-0"><a th:href="|tel:${sitePhone}|" th:text="${sitePhone}" class="text-white text-decoration-none hover-accent fw-bold">09...</a></p>
+                            </div>
+                        </div>
+
+                        <div class="contact-info-item d-flex align-items-start mb-4">
+                            <div class="icon-box bg-white bg-opacity-10 rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 me-3" style="width: 40px; height: 40px;">
+                                <i class="fas fa-envelope text-accent fs-6"></i>
+                            </div>
+                            <div>
+                                <h6 class="fw-bold text-accent mb-1 small text-uppercase">Email</h6>
+                                <p class="mb-0"><a th:href="|mailto:${siteEmail}|" th:text="${siteEmail}" class="text-white text-decoration-none hover-accent small">email@...</a></p>
+                            </div>
+                        </div>
+
+                        <hr class="border-white-10 my-4 opacity-25">
+
+                        <h6 class="fw-bold text-white mb-3 small text-uppercase">Mạng xã hội</h6>
+                        <div class="d-flex gap-2">
+                            <a th:href="${socialFacebook}" target="_blank" class="social-btn bg-white bg-opacity-10 text-white hover-bg-accent transition-all rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a th:href="${socialYoutube}" target="_blank" class="social-btn bg-white bg-opacity-10 text-white hover-bg-danger transition-all rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                            <a th:href="${socialZalo}" target="_blank" class="social-btn bg-white bg-opacity-10 text-white hover-bg-info transition-all rounded-circle d-flex align-items-center justify-content-center">
+                                <i class="fas fa-comments"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

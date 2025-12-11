@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center">
+    <div class="container animate__animated animate__fadeInDown">
+        <h1 class="display-4 fw-bold mb-3" th:text="${pageTitle}">Tin tức & Sự kiện</h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
+            Cập nhật những thông tin mới nhất về công nghệ, giáo dục và các hoạt động của GDVCNS.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-body">
+    <div class="container">
+        <div class="row align-items-start">
+
+            <div class="col-lg-8 animate-on-scroll">
+
+                <div class="bg-white p-4 rounded-4 shadow-sm mb-4">
+                    <form th:action="@{/tin-tuc}" method="get">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0"
+                                   name="keyword" th:value="${keyword}"
+                                   placeholder="Tìm kiếm tin tức...">
+                            <button type="submit" class="btn btn-primary px-4">Tìm</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6" th:each="news, iter : ${newsList}" th:attr="data-delay=${iter.index * 50}">
+                        <div class="card-modern h-100 d-flex flex-column">
+                            <div class="card-img-wrapper" style="height: 200px; overflow: hidden; position: relative;">
+                                <img th:src="${news.thumbnailUrl != null ? news.thumbnailUrl : 'https://via.placeholder.com/400x250'}"
+                                     th:alt="${news.title}"
+                                     style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+
+                                <div class="position-absolute top-0 start-0 m-3 bg-white rounded-3 shadow-sm text-center p-2"
+                                     style="min-width: 50px;" th:if="${news.publishedAt != null}">
+                                    <span class="d-block fw-bold fs-5 text-primary" style="line-height: 1;"
+                                          th:text="${#temporals.format(news.publishedAt, 'dd')}">01</span>
+                                    <span class="d-block small text-muted text-uppercase" style="font-size: 0.65rem;"
+                                          th:text="${#temporals.format(news.publishedAt, 'MMM')}">DEC</span>
+                                </div>
+                            </div>
+
+                            <div class="card-body-modern flex-grow-1 d-flex flex-column">
+                                <h4 class="card-title-modern fs-5">
+                                    <a th:href="@{/tin-tuc/{slug}(slug=${news.slug})}"
+                                       th:text="${news.title}"
+                                       class="text-decoration-none text-dark hover-accent">Tiêu đề</a>
+                                </h4>
+                                <p class="text-muted small line-clamp-3 mb-3 flex-grow-1" th:text="${news.summary}">Mô tả...</p>
+
+                                <div class="mt-auto">
+                                    <a th:href="@{/tin-tuc/{slug}(slug=${news.slug})}"
+                                       class="text-accent fw-bold small text-decoration-none group-hover-translate">
+                                        Đọc tiếp <i class="fas fa-arrow-right ms-1 transition-transform"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <nav class="mt-5" aria-label="Page navigation" th:if="${newsList.totalPages > 1}">
+                    <ul class="pagination justify-content-center">
+                        <li class="page-item" th:classappend="${newsList.first} ? 'disabled'">
+                            <a class="page-link rounded-pill px-3 mx-1 border-0 shadow-sm"
+                               th:href="@{/tin-tuc(page=${newsList.number - 1})}"><i class="fas fa-chevron-left"></i></a>
+                        </li>
+                        <li class="page-item active">
+                            <a class="page-link rounded-circle mx-1 border-0 shadow-sm d-flex align-items-center justify-content-center"
+                               style="width: 40px; height: 40px;" href="#" th:text="${newsList.number + 1}">1</a>
+                        </li>
+                        <li class="page-item" th:classappend="${newsList.last} ? 'disabled'">
+                            <a class="page-link rounded-pill px-3 mx-1 border-0 shadow-sm"
+                               th:href="@{/tin-tuc(page=${newsList.number + 1})}"><i class="fas fa-chevron-right"></i></a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="col-lg-4 mt-5 mt-lg-0 animate-on-scroll" data-delay="200">
+                <div class="sidebar-static-wrapper">
+                    <div class="card-modern border-0 shadow-sm p-4 bg-white">
+                        <h5 class="fw-bold mb-4 position-relative pb-2">
+                            Tin mới nhất
+                            <span class="position-absolute bottom-0 start-0 w-25 h-1 bg-accent rounded"></span>
+                        </h5>
+
+                        <ul class="list-unstyled mb-0">
+                            <li th:each="recent : ${recentNews}" class="mb-4 d-flex align-items-start group-hover-parent">
+                                <div class="rounded-3 overflow-hidden me-3 flex-shrink-0" style="width: 80px; height: 60px;">
+                                    <img th:src="${recent.thumbnailUrl != null ? recent.thumbnailUrl : 'https://via.placeholder.com/100'}"
+                                         class="w-100 h-100 object-fit-cover transition-transform"
+                                         alt="Thumbnail">
+                                </div>
+                                <div>
+                                    <h6 class="mb-1 fw-bold" style="font-size: 0.9rem; line-height: 1.4;">
+                                        <a th:href="@{/tin-tuc/{slug}(slug=${recent.slug})}"
+                                           class="text-decoration-none text-dark hover-accent"
+                                           th:text="${recent.title}">Title</a>
+                                    </h6>
+                                    <small class="text-muted" th:text="${#temporals.format(recent.publishedAt, 'dd/MM/yyyy')}">Date</small>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

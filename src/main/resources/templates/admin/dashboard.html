@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">Tổng quan thống kê hệ thống</p>
+            </div>
+
+            <div class="stat-cards">
+                <div class="stat-card bg-primary">
+                    <div class="stat-icon">
+                        <i class="fas fa-newspaper"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Tổng bài viết</span>
+                        <h3 class="stat-value" th:text="${totalPosts}">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-warning">
+                    <div class="stat-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Liên hệ mới</span>
+                        <h3 class="stat-value" th:text="${newContacts}">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-success">
+                    <div class="stat-icon">
+                        <i class="fas fa-project-diagram"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Dự án hoạt động</span>
+                        <h3 class="stat-value" th:text="${activeProjects}">0</h3>
+                    </div>
+                </div>
+
+                <div class="stat-card bg-info">
+                    <div class="stat-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <span class="stat-label">Tổng lượt truy cập</span>
+                        <h3 class="stat-value" th:text="${totalViews}">0</h3>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Liên hệ mới nhất</h5>
+                    <a th:href="@{/admin/contacts}" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Họ tên</th>
+                            <th>Điện thoại</th>
+                            <th>Email</th>
+                            <th>Chủ đề</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${#lists.isEmpty(recentContacts)}">
+                            <td colspan="6" class="text-center py-3">Chưa có liên hệ nào.</td>
+                        </tr>
+
+                        <tr th:each="contact : ${recentContacts}">
+                            <td th:text="${contact.fullName}">Tên khách</td>
+                            <td th:text="${contact.phone}">0912345678</td>
+                            <td th:text="${contact.email}">email@example.com</td>
+                            <td th:text="${contact.subject}">Chủ đề</td>
+                            <td>
+                                        <span th:classappend="${'badge-status-' + contact.status.toString().toLowerCase()}"
+                                              class="badge" th:text="${contact.status}">NEW</span>
+                            </td>
+                            <td>
+                                <a th:href="@{/admin/contacts/{id}(id=${contact.id})}"
+                                   class="btn btn-sm btn-info text-white" title="Xem chi tiết">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+</body>
+
+</html>

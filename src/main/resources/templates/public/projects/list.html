@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center">
+    <div class="container animate__animated animate__fadeInDown">
+        <h1 class="display-4 fw-bold mb-3" th:text="${pageTitle}">Dự án tiêu biểu</h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
+            Những dấu ấn thành công trên hành trình chuyển đổi số quốc gia.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-light-section">
+    <div class="container">
+
+        <div class="row mb-4 animate-on-scroll">
+            <div class="col-12">
+                <div class="bg-white p-4 rounded-4 shadow-sm">
+                    <form th:action="@{/du-an}" method="get">
+                        <div class="input-group">
+                            <span class="input-group-text bg-white border-end-0"><i class="fas fa-search text-muted"></i></span>
+                            <input type="text" class="form-control border-start-0 ps-0"
+                                   name="keyword" th:value="${keyword}"
+                                   placeholder="Tìm kiếm dự án...">
+                            <button type="submit" class="btn btn-primary px-4">Tìm kiếm</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 animate-on-scroll"
+                 th:each="project, iter : ${projects}"
+                 th:attr="data-delay=${iter.index * 50}">
+
+                <div class="card-modern h-100">
+                    <div class="card-img-wrapper" style="height: 250px; overflow: hidden;">
+                        <img th:src="${project.thumbnailUrl != null ? project.thumbnailUrl : 'https://via.placeholder.com/400x300'}"
+                             th:alt="${project.title}"
+                             style="width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s;">
+
+                        <div class="card-overlay d-flex align-items-center justify-content-center">
+                            <a th:href="@{/du-an/{slug}(slug=${project.slug})}" class="btn btn-light rounded-circle shadow-lg" style="width: 50px; height: 50px; display: flex; align-items: center; justify-content: center;">
+                                <i class="fas fa-arrow-right text-primary"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body-modern p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-10 rounded-pill px-3 py-1"
+                                  th:text="${project.categoryName}">Danh mục</span>
+
+                            <small class="text-muted fw-bold font-monospace" th:text="${#temporals.format(project.publishedAt, 'MM/yyyy')}">2025</small>
+                        </div>
+
+                        <h4 class="card-title-modern fs-5 mt-2">
+                            <a th:href="@{/du-an/{slug}(slug=${project.slug})}"
+                               th:text="${project.title}"
+                               class="text-decoration-none text-dark hover-accent">Tên dự án</a>
+                        </h4>
+
+                        <p class="text-muted small line-clamp-2 mb-3" th:text="${project.summary}">Mô tả ngắn</p>
+
+                        <a th:href="@{/du-an/{slug}(slug=${project.slug})}" class="btn btn-link px-0 text-decoration-none fw-bold text-accent">
+                            Xem chi tiết <i class="fas fa-long-arrow-alt-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

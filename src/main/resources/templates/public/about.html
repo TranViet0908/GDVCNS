@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center">
+    <div class="container">
+        <h1 class="fw-bold display-4 animate__animated animate__fadeInDown">Về Chúng Tôi</h1>
+        <p class="lead text-white-50 animate__animated animate__fadeInUp">Hành trình kiến tạo năng lực số cho giáo dục Việt Nam</p>
+    </div>
+</section>
+
+<section class="section-padding">
+    <div class="container">
+        <div class="row align-items-center mb-5 pb-5">
+            <div class="col-lg-6 animate-on-scroll">
+                <span class="section-label">Câu chuyện thương hiệu</span>
+                <h2 class="section-heading mb-4">GDVCNS - Tiên Phong & Đổi Mới</h2>
+                <div class="formatted-content text-muted fs-5 lh-base" th:utext="${configs['site_intro']}">
+                </div>
+            </div>
+            <div class="col-lg-6 mt-5 mt-lg-0 animate-on-scroll" data-delay="200">
+                <div class="position-relative ps-lg-5">
+                    <div class="position-absolute w-100 h-100 rounded-4 bg-accent"
+                         style="top: 20px; left: 40px; opacity: 0.1; z-index: 0;"></div>
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                         alt="About Team" class="img-fluid rounded-4 shadow-lg position-relative" style="z-index: 1;">
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4 mb-5 pb-5">
+            <div class="col-md-6 animate-on-scroll">
+                <div class="card-modern h-100 border-top border-5 border-primary p-4">
+                    <div class="card-body-modern text-center">
+                        <div class="mb-4 d-inline-block p-3 rounded-circle bg-primary bg-opacity-10 text-primary">
+                            <i class="fas fa-eye fa-2x"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Tầm Nhìn</h3>
+                        <div class="text-muted formatted-content" th:utext="${configs['site_vision']}"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 animate-on-scroll" data-delay="200">
+                <div class="card-modern h-100 border-top border-5 border-info p-4">
+                    <div class="card-body-modern text-center">
+                        <div class="mb-4 d-inline-block p-3 rounded-circle bg-info bg-opacity-10 text-info">
+                            <i class="fas fa-rocket fa-2x"></i>
+                        </div>
+                        <h3 class="fw-bold mb-3">Sứ Mệnh</h3>
+                        <div class="text-muted formatted-content" th:utext="${configs['site_mission']}"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-padding bg-light-section rounded-4 my-5 animate-on-scroll text-center position-relative overflow-hidden">
+            <div class="position-absolute top-0 start-0 w-100 h-100 bg-white opacity-50"></div>
+            <div class="position-relative z-1">
+                <span class="section-label">Core Values</span>
+                <h2 class="section-heading mb-5">Giá Trị Cốt Lõi</h2>
+                <div class="container" style="max-width: 800px;">
+                    <div class="formatted-content fs-5" th:utext="${configs['site_core_values']}"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mb-5 mt-5 animate-on-scroll pt-5">
+            <span class="section-label">Leadership</span>
+            <h2 class="section-heading">Ban Lãnh Đạo</h2>
+        </div>
+
+        <div class="row g-4 justify-content-center">
+            <div class="col-md-6 col-lg-3 animate-on-scroll">
+                <div class="card-modern text-center h-100">
+                    <div class="card-body-modern p-4 pt-5">
+                        <div class="mb-4 position-relative d-inline-block">
+                            <img src="https://ui-avatars.com/api/?name=Pham+Thi+Ha+Phuong&background=0f172a&color=fff&size=150"
+                                 class="rounded-circle shadow-lg p-1 bg-white" width="120" height="120" alt="Avatar">
+                            <span class="position-absolute bottom-0 end-0 bg-accent text-white rounded-circle p-2 shadow-sm" style="font-size: 0.8rem;">
+                                    <i class="fas fa-star"></i>
+                            </span>
+                        </div>
+                        <h5 class="fw-bold mb-1">Phạm Thị Hà Phương</h5>
+                        <p class="text-accent fw-bold small mb-2 text-uppercase ls-1">Tổng Giám Đốc</p>
+                        <p class="text-muted small mb-0 fst-italic">Đại diện pháp luật</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 animate-on-scroll" data-delay="100">
+                <div class="card-modern text-center h-100">
+                    <div class="card-body-modern p-4 pt-5">
+                        <div class="mb-4">
+                            <img src="https://ui-avatars.com/api/?name=Nguyen+Van+Suyen&background=random&size=150"
+                                 class="rounded-circle shadow p-1 bg-white" width="120" height="120" alt="Avatar">
+                        </div>
+                        <h5 class="fw-bold mb-1">Nguyễn Văn Suyên</h5>
+                        <p class="text-primary fw-bold small mb-2 text-uppercase ls-1">Cổ đông sáng lập</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3 animate-on-scroll" data-delay="200">
+                <div class="card-modern text-center h-100">
+                    <div class="card-body-modern p-4 pt-5">
+                        <div class="mb-4">
+                            <img src="https://ui-avatars.com/api/?name=Nguyen+Van+Hach&background=random&size=150"
+                                 class="rounded-circle shadow p-1 bg-white" width="120" height="120" alt="Avatar">
+                        </div>
+                        <h5 class="fw-bold mb-1">Nguyễn Văn Hách</h5>
+                        <p class="text-primary fw-bold small mb-2 text-uppercase ls-1">Cổ đông sáng lập</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

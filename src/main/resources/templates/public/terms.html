@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center">
+    <div class="container animate__animated animate__fadeInDown">
+        <h1 class="display-4 fw-bold mb-3">Điều Khoản Sử Dụng</h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
+            Các quy định và thỏa thuận khi sử dụng dịch vụ của GDVCNS.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 animate-on-scroll">
+                <div class="formatted-content text-dark fs-6 lh-lg">
+                    <p class="fw-bold">Hiệu lực từ: 12/09/2025</p>
+                    <p>Khi truy cập website hoặc đăng ký dịch vụ tại <strong>GDVCNS</strong>, bạn đồng ý tuân thủ các điều khoản dưới đây.</p>
+
+                    <h4 class="mt-4 fw-bold text-primary">1. Quyền sở hữu trí tuệ</h4>
+                    <p>Tất cả nội dung trên website này, bao gồm tài liệu khóa học, video bài giảng, hình ảnh, logo, và phần mềm đều thuộc sở hữu của GDVCNS hoặc các đối tác cấp phép.</p>
+                    <p>Nghiêm cấm sao chép, phát tán hoặc sử dụng tài liệu cho mục đích thương mại mà không có sự đồng ý bằng văn bản của chúng tôi.</p>
+
+                    <h4 class="mt-4 fw-bold text-primary">2. Trách nhiệm người dùng</h4>
+                    <ul>
+                        <li>Cung cấp thông tin chính xác khi đăng ký tài khoản hoặc khóa học.</li>
+                        <li>Không sử dụng website để phát tán mã độc, spam hoặc nội dung vi phạm pháp luật.</li>
+                        <li>Bảo mật tài khoản đăng nhập (nếu có) và thông báo ngay cho chúng tôi nếu phát hiện truy cập trái phép.</li>
+                    </ul>
+
+                    <h4 class="mt-4 fw-bold text-primary">3. Thanh toán và Hoàn tiền</h4>
+                    <p>Các khoản phí khóa học được niêm yết công khai. Việc hoàn tiền sẽ tuân theo chính sách riêng của từng khóa học (thường sẽ được hoàn trả 100% nếu khóa học bị hủy bởi GDVCNS).</p>
+
+                    <h4 class="mt-4 fw-bold text-primary">4. Từ chối trách nhiệm</h4>
+                    <p>GDVCNS nỗ lực cung cấp thông tin chính xác nhất, tuy nhiên chúng tôi không chịu trách nhiệm về các gián đoạn dịch vụ do sự cố kỹ thuật khách quan (như lỗi đường truyền internet diện rộng).</p>
+
+                    <h4 class="mt-4 fw-bold text-primary">5. Thay đổi điều khoản</h4>
+                    <p>Chúng tôi có quyền thay đổi các điều khoản này bất cứ lúc nào. Những thay đổi sẽ có hiệu lực ngay khi được đăng tải trên website.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mt-5 mt-lg-0 animate-on-scroll" data-delay="200">
+                <div class="card-modern border-0 shadow-sm p-4 sticky-top bg-light" style="top: 100px;">
+                    <h5 class="fw-bold mb-3">Thông tin liên quan</h5>
+                    <div class="list-group list-group-flush bg-transparent">
+                        <a th:href="@{/chinh-sach-bao-mat}" class="list-group-item list-group-item-action bg-transparent border-bottom px-0 py-3">
+                            <i class="fas fa-shield-alt text-accent me-2"></i> Chính sách bảo mật
+                        </a>
+                        <a th:href="@{/lien-he}" class="list-group-item list-group-item-action bg-transparent border-bottom px-0 py-3">
+                            <i class="fas fa-question-circle text-accent me-2"></i> Câu hỏi thường gặp
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

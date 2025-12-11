@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="page-title" th:text="${contact.id == null ? 'Tạo liên hệ mới' : 'Chi tiết / Cập nhật Liên hệ'}">Title</h1>
+            </div>
+
+            <form th:action="@{/admin/contacts/save}" th:object="${contact}" method="POST">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Thông tin liên hệ</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Họ tên <span class="text-danger">*</span></label>
+                                        <input type="text" class="form-control" th:field="*{fullName}" required placeholder="Nhập họ tên...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Điện thoại</label>
+                                        <input type="text" class="form-control" th:field="*{phone}" placeholder="Nhập số điện thoại...">
+                                    </div>
+                                </div>
+
+                                <div class="row mb-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label fw-bold">Email</label>
+                                        <input type="email" class="form-control" th:field="*{email}" placeholder="Nhập email...">
+                                    </div>
+                                    <div class="col-md-6" th:if="${contact.createdAt != null}">
+                                        <label class="form-label fw-bold">Ngày gửi</label>
+                                        <input type="text" class="form-control"
+                                               th:value="${#temporals.format(contact.createdAt, 'dd/MM/yyyy HH:mm')}"
+                                               disabled readonly>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Chủ đề</label>
+                                    <input type="text" class="form-control" th:field="*{subject}" placeholder="Nhập chủ đề...">
+                                </div>
+
+                                <div class="mb-0">
+                                    <label class="form-label fw-bold">Nội dung tin nhắn</label>
+                                    <textarea class="form-control" rows="6" th:field="*{message}" placeholder="Nội dung khách hàng gửi..."></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Trạng thái & Hành động</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="mb-3">
+                                    <label class="form-label">Trạng thái xử lý</label>
+                                    <select class="form-select" th:field="*{status}">
+                                        <option value="NEW">Mới</option>
+                                        <option value="PROCESSING">Đang xử lý</option>
+                                        <option value="DONE">Đã hoàn thành</option>
+                                    </select>
+                                </div>
+
+                                <hr>
+
+                                <button type="submit" class="btn btn-primary w-100 mb-2">
+                                    <i class="fas fa-save"></i> Lưu dữ liệu
+                                </button>
+
+                                <a th:href="@{/admin/contacts}" class="btn btn-secondary w-100">
+                                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+</body>
+</html>

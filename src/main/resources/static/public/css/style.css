@@ -1,0 +1,526 @@
+:root {
+    /* --- BẢNG MÀU CHUẨN (Modern Palette) --- */
+    --primary: #0f172a;       /* Slate 900: Màu chủ đạo (Xanh đen đậm) */
+    --primary-light: #1e293b; /* Slate 800: Màu nền phụ */
+    --accent: #3b82f6;        /* Blue 500: Màu nhấn (Nút, Link) */
+    --accent-hover: #2563eb;  /* Blue 600: Màu nhấn khi hover */
+
+    --text-dark: #1e293b;     /* Màu chữ chính (Đen xanh) */
+    --text-muted: #64748b;    /* Màu chữ phụ (Xám) */
+    --text-light: #f8fafc;    /* Màu chữ sáng (Trắng xám) */
+
+    --bg-body: #f8fafc;       /* Nền body (Xám rất nhạt, không phải trắng tinh) */
+    --bg-white: #ffffff;      /* Nền thẻ Card */
+
+    --font-main: 'Inter', sans-serif;
+    --radius-md: 12px;        /* Bo góc chuẩn */
+    --shadow-card: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-hover: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* --- CẤU HÌNH CHUNG --- */
+body {
+    font-family: var(--font-main);
+    background-color: var(--bg-body);
+    color: var(--text-dark);
+    line-height: 1.6;
+    overflow-x: hidden; /* Tránh thanh cuộn ngang */
+}
+
+a { text-decoration: none; transition: all 0.3s ease; }
+
+/* --- 1. NAVBAR (DARK GLASSMORPHISM) --- */
+.navbar {
+    background: rgba(15, 23, 42, 0.95) !important; /* Nền tối thẫm */
+    backdrop-filter: blur(12px); /* Hiệu ứng kính mờ */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 0.8rem 0;
+    transition: all 0.3s ease;
+}
+
+.navbar-brand {
+    color: var(--text-light) !important;
+    font-weight: 700;
+    font-size: 1.35rem;
+    letter-spacing: -0.5px;
+}
+
+/* Link Menu: Mặc định màu trắng mờ, Hover sáng lên */
+.nav-link {
+    color: rgba(255, 255, 255, 0.75) !important;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 0.5rem 1.5rem !important;
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.nav-link:hover, .nav-link.active {
+    color: var(--accent) !important; /* Hover ra màu xanh */
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* Dropdown Menu màu tối cho đồng bộ */
+.dropdown-menu {
+    background-color: var(--primary-light);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    box-shadow: var(--shadow-hover);
+    margin-top: 10px !important;
+    padding: 0.5rem;
+}
+
+.dropdown-item {
+    color: rgba(255, 255, 255, 0.9);
+    border-radius: 4px;
+    padding: 8px 16px;
+}
+
+.dropdown-item:hover {
+    background-color: var(--accent);
+    color: white;
+}
+
+/* --- 2. HERO SECTION (DARK MODE) --- */
+.hero-section {
+    position: relative;
+    padding: 80px 0 60px; /* Tăng padding top để không bị header che */
+    /* Ảnh nền công nghệ */
+    background: url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+    color: white;
+    overflow: hidden;
+}
+
+/* Nội dung Hero phải nổi lên trên lớp phủ */
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+.hero-title-static {
+    font-size: 3.5rem;
+    font-weight: 800;
+    line-height: 1.2;
+    margin-bottom: 1.5rem;
+    color: white;
+}
+
+/* Chữ Gradient nổi bật */
+.highlight {
+    background: linear-gradient(90deg, #3b82f6, #22d3ee);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 900;
+}
+
+@media (max-width: 768px) {
+    .hero-title-static {
+        font-size: 2.5rem;
+    }
+}
+
+.hero-desc {
+    font-size: 1.25rem;
+    color: rgba(255, 255, 255, 0.85); /* Trắng mờ dễ đọc */
+    max-width: 700px;
+    margin: 0 auto 2.5rem;
+}
+
+.hero-img {
+    max-width: 100%;
+    max-height: 450px; /* Giới hạn chiều cao ảnh */
+    object-fit: contain;
+    /* Hiệu ứng trôi nhẹ giữ nguyên */
+    animation: floatImage 6s ease-in-out infinite;
+    filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
+}
+
+/* --- 3. SECTIONS & LAYOUT --- */
+.section-padding {
+    overflow: visible !important; /* Bắt buộc visible để sticky hoạt động */
+}
+/* Nền trắng cho section quan trọng */
+.bg-white-section {
+    background-color: var(--bg-white);
+}
+
+/* Nền xám xanh nhạt cho section phụ (Tạo sự phân cách) */
+.bg-light-section {
+    background-color: #f1f5f9;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.section-label {
+    color: var(--accent);
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    display: block;
+    margin-bottom: 0.5rem;
+    padding-top: 30px
+}
+
+.section-heading {
+    color: var(--primary);
+    font-weight: 800;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    letter-spacing: -0.5px;
+}
+
+/* --- 4. CARDS (MODERN) --- */
+.card-modern {
+    background: var(--bg-white);
+    border: none;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-card);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-modern:hover {
+    transform: translateY(-8px); /* Nhấc lên khi hover */
+    box-shadow: var(--shadow-hover);
+}
+
+.card-body-modern { padding: 1.5rem; }
+
+.card-tag {
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.card-title-modern {
+    font-size: 1.25rem;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 0.75rem;
+}
+
+.card-title-modern a {
+    color: var(--text-dark);
+    transition: color 0.2s;
+}
+
+.card-title-modern a:hover { color: var(--accent); }
+
+/* --- 5. BUTTONS --- */
+.btn-modern {
+    padding: 12px 32px;
+    border-radius: 50px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary-modern {
+    background: var(--accent);
+    color: white;
+    border: none;
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.4); /* Bóng xanh */
+}
+
+.btn-primary-modern:hover {
+    background: var(--accent-hover);
+    transform: translateY(-2px);
+    color: white;
+    box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
+}
+
+.btn-outline-modern {
+    background: transparent;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+.btn-outline-modern:hover {
+    background: white;
+    color: var(--primary);
+    border-color: white;
+}
+
+/* --- 6. FOOTER MODERN (Fix lỗi trắng xóa) --- */
+.footer-modern {
+    background-color: #0f172a !important; /* Bắt buộc màu tối */
+    color: #cbd5e1; /* Màu chữ xám sáng */
+    padding: 20px 0 10px;
+    margin-top: auto;
+    position: relative;
+    z-index: 10;
+}
+
+.footer-heading {
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.footer-desc {
+    color: #94a3b8;
+    font-size: 0.95rem;
+    line-height: 1.6;
+    margin-bottom: 1.5rem;
+}
+
+.footer-link {
+    color: #94a3b8;
+    text-decoration: none;
+    display: block;
+    margin-bottom: 0.75rem;
+    transition: all 0.3s ease;
+}
+
+.footer-link:hover {
+    color: var(--accent);
+    transform: translateX(5px);
+}
+
+.footer-contact li {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+    color: #cbd5e1;
+}
+
+.footer-contact li i {
+    color: var(--accent);
+    margin-top: 5px;
+    margin-right: 12px;
+}
+
+/* Social Buttons trong Footer */
+.social-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: all 0.3s;
+}
+
+.social-btn:hover {
+    background: var(--accent);
+    transform: translateY(-3px);
+    color: white;
+}
+
+.border-white-10 {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Tiện ích khác */
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* --- 7. SUB-PAGE HEADER (Header cho các trang con) --- */
+.page-header {
+    position: relative;
+    padding: 100px 0 60px;
+    background: url('https://images.unsplash.com/photo-1519389950473-47ba0277781c?ixlib=rb-1.2.1&auto=format&fit=crop&w=1920&q=80') no-repeat center center/cover;
+    color: white;
+    margin-bottom: 3rem;
+    padding-bottom: 60px !important; /* Giảm từ 120px xuống 60px */}
+
+.page-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    /* Overlay tối màu giống trang chủ */
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.9) 0%, rgba(15, 23, 42, 0.8) 100%);
+    z-index: 1;
+}
+
+.page-header .container {
+    position: relative;
+    z-index: 2;
+}
+
+/* --- 8. FORM STYLING (Contact Form đẹp hơn) --- */
+.form-control {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+    background-color: #f8fafc;
+    transition: all 0.3s;
+}
+
+.form-control:focus {
+    background-color: #fff;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+}
+
+.contact-info-box {
+    background: var(--primary); /* Nền tối */
+    color: white;
+    border-radius: var(--radius-md);
+    padding: 2rem;
+    height: 100%;
+    box-shadow: var(--shadow-hover);
+}
+
+.contact-info-item i {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    color: var(--accent);
+    margin-right: 15px;
+}
+
+/* --- 9. FORMAT CONTENT (Để style nội dung từ DB đẹp hơn) --- */
+/* Class này bọc nội dung lấy từ th:utext */
+.formatted-content ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.formatted-content ul li {
+    position: relative;
+    padding-left: 1.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.formatted-content ul li::before {
+    content: "\f00c"; /* FontAwesome Check icon */
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    position: absolute;
+    left: 0;
+    color: var(--accent);
+}
+
+/* --- 1. CSS CHO HIỆU ỨNG CHỮ CHẠY (HERO TEXT) --- */
+.hero-title .letter {
+    display: inline-block; /* Bắt buộc có dòng này để animate được translateY */
+    line-height: 1em;
+    transform-origin: 0 0;
+}
+
+/* --- 2. CSS CHO HIỆU ỨNG HẠT BAY (PARTICLES) --- */
+/* Đảm bảo hero-section có position relative để hạt bay bên trong nó */
+.hero-section {
+    position: relative;
+    overflow: hidden; /* Ẩn các hạt bay ra ngoài khung */
+}
+
+.particle {
+    position: absolute;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3); /* Màu trắng mờ */
+    pointer-events: none; /* Để chuột không bấm trúng hạt */
+    z-index: 1; /* Nằm trên nền nhưng dưới nội dung chính */
+}
+
+/* --- 3. CSS CHO SCROLL REVEAL --- */
+/* Mặc định ẩn phần tử để JS hiện ra sau */
+.animate-on-scroll {
+    opacity: 0;
+    will-change: transform, opacity; /* Tối ưu hiệu năng render */
+}
+
+/* Tùy chỉnh Accordion */
+.accordion-button:not(.collapsed) {
+    color: var(--accent);
+    background-color: #f8fafc;
+    box-shadow: inset 0 -1px 0 rgba(0,0,0,.125);
+}
+.accordion-button:focus {
+    box-shadow: none;
+    border-color: rgba(0,0,0,.125);
+}
+.sidebar-sticky-wrapper {
+    /* Sử dụng sticky standard */
+    position: -webkit-sticky;
+    position: sticky;
+    /* Top: khoảng cách từ mép trên trình duyệt xuống */
+    top: 100px;
+    /* Z-index thấp hơn header nhưng cao hơn content thường */
+    z-index: 5;
+    /* Quan trọng: Sidebar chỉ sticky nếu cha của nó (section) không có overflow:hidden */
+}
+.contact-info-wrapper {
+    background: var(--primary);
+    color: white;
+    /* QUAN TRỌNG: h-100 để chiều cao kéo giãn bằng cột bên trái */
+    height: 100%;
+    padding: 3rem 2rem;
+    /* Bo góc bên phải khớp với card cha */
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+@media (max-width: 991.98px) {
+    .contact-info-wrapper {
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        height: auto; /* Trên mobile thì height tự nhiên */
+        padding: 50px;
+    }
+}
+/* ... (Giữ nguyên toàn bộ nội dung cũ từ dòng 1 đến dòng 460) ... */
+
+/* --- CUSTOM FIXES (YÊU CẦU MỚI) --- */
+
+/* 1. Contact Page Fixes */
+/* Xóa margin âm để không đè lên Hero, tách biệt Footer */
+.section-contact-fix {
+    margin-top: 0 !important;
+    padding-top: 60px;
+    padding-bottom: 80px; /* Cách xa footer */
+    position: relative;
+    z-index: 2;
+}
+
+/* Đảm bảo cột thông tin và form cao bằng nhau */
+.contact-row-equal {
+    align-items: stretch;
+}
+
+.contact-info-wrapper-fix {
+    background: var(--primary);
+    color: white;
+    height: 100%; /* Kéo giãn bằng cột bên cạnh */
+    padding: 3rem 2rem;
+    border-radius: 0 var(--radius-md) var(--radius-md) 0;
+}
+
+/* Responsive cho Contact */
+@media (max-width: 991.98px) {
+    .contact-info-wrapper-fix {
+        border-radius: 0 0 var(--radius-md) var(--radius-md);
+        height: auto;
+    }
+    .card-contact-radius-fix {
+        border-radius: var(--radius-md);
+        overflow: hidden;
+    }
+}
+
+/* 2. Sidebar Static (Bỏ trôi/sticky) */
+.sidebar-static-wrapper {
+    position: static !important; /* Ghi đè thuộc tính sticky cũ */
+    top: auto;
+    z-index: 1;
+}
+
+/* 3. Search Box Alignment */
+/* Đảm bảo ô tìm kiếm và ô sidebar có cùng khoảng cách top */
+.search-box-wrapper {
+    margin-bottom: 2rem;
+}

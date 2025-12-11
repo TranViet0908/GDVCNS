@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+            <div class="content-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title">Quản lý Danh mục</h1>
+                    <p class="page-subtitle">Phân loại nội dung bài viết và khóa học</p>
+                </div>
+                <a th:href="@{/admin/categories/new}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm danh mục
+                </a>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <form th:action="@{/admin/categories}" method="get" class="row g-3">
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0">
+                                        <i class="fas fa-search text-muted"></i>
+                                    </span>
+                                <input type="text" class="form-control border-start-0 ps-0"
+                                       name="keyword"
+                                       th:value="${keyword}"
+                                       placeholder="Tìm kiếm danh mục theo tên...">
+                                <button class="btn btn-primary" type="submit">Tìm kiếm</button>
+                                <a th:if="${keyword}" th:href="@{/admin/categories}" class="btn btn-secondary" title="Xóa tìm kiếm">
+                                    <i class="fas fa-times"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
+                        <tr>
+                            <th style="width: 30%;">Tên danh mục</th>
+                            <th style="width: 25%;">Danh mục cha</th>
+                            <th style="width: 25%;">Slug</th>
+                            <th style="width: 10%;">Loại</th>
+                            <th style="width: 10%;" class="text-end">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${categories.empty}">
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted">
+                                    <i class="fas fa-folder-open fa-3x mb-3 opacity-50"></i>
+                                    <p>Không tìm thấy dữ liệu nào.</p>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr th:each="cat : ${categories}">
+                            <td>
+                                <div class="fw-bold text-dark" th:text="${cat.name}">Tên danh mục</div>
+                            </td>
+                            <td>
+                                        <span th:if="${cat.parentName}" class="badge bg-light text-dark border">
+                                            <i class="fas fa-level-up-alt me-1 text-muted"></i>
+                                            <span th:text="${cat.parentName}"></span>
+                                        </span>
+                                <span th:unless="${cat.parentName}" class="text-muted fst-italic small">- Gốc -</span>
+                            </td>
+                            <td>
+                                <code class="text-primary small" th:text="${cat.slug}">slug-name</code>
+                            </td>
+                            <td>
+                                        <span class="badge"
+                                              th:classappend="${cat.type.name() == 'POST' ? 'bg-info' : 'bg-warning'}"
+                                              th:text="${cat.type.name() == 'POST' ? 'Bài viết' : 'Khóa học'}">
+                                        </span>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group">
+                                    <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}"
+                                       class="btn btn-sm btn-outline-primary" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a th:href="@{/admin/categories/{id}/delete(id=${cat.id})}"
+                                       class="btn btn-sm btn-outline-danger"
+                                       onclick="return confirm('Cảnh báo: Xóa danh mục cha sẽ xóa tất cả danh mục con!\nBạn có chắc chắn muốn xóa?')"
+                                       title="Xóa">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script th:if="${successMessage}">
+    document.addEventListener('DOMContentLoaded', () => {
+        showToast("[[${successMessage}]]", 'success');
+    });
+</script>
+<script th:if="${errorMessage}">
+    document.addEventListener('DOMContentLoaded', () => {
+        showToast("[[${errorMessage}]]", 'error');
+    });
+</script>
+</body>
+</html>

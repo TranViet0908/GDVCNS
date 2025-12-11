@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title">Quản lý Bài viết</h1>
+                    <p class="page-subtitle">Tin tức, Sự kiện, Thông báo</p>
+                </div>
+                <a th:href="@{/admin/posts/new}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Thêm bài viết
+                </a>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <form th:action="@{/admin/posts}" method="GET" id="searchForm">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" name="keyword"
+                                       th:value="${keyword}" placeholder="Tìm kiếm theo tiêu đề...">
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="categoryId" onchange="this.form.submit()">
+                                    <option value="">Tất cả danh mục</option>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.id}"
+                                            th:text="${cat.name}"
+                                            th:selected="${categoryId != null && categoryId == cat.id}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="status" onchange="this.form.submit()">
+                                    <option value="">Tất cả trạng thái</option>
+                                    <option value="PUBLISHED" th:selected="${status != null && status.name() == 'PUBLISHED'}">Công khai</option>
+                                    <option value="DRAFT" th:selected="${status != null && status.name() == 'DRAFT'}">Nháp</option>
+                                    <option value="PENDING" th:selected="${status != null && status.name() == 'PENDING'}">Chờ duyệt</option>
+                                    <option value="HIDDEN" th:selected="${status != null && status.name() == 'HIDDEN'}">Ẩn</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <a th:href="@{/admin/posts}" class="btn btn-secondary w-100"><i class="fas fa-sync"></i> Reset</a>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th style="width: 60px;">Ảnh</th>
+                            <th>Tiêu đề</th>
+                            <th style="width: 150px;">Danh mục</th>
+                            <th style="width: 120px;">Tác giả</th>
+                            <th style="width: 100px;">Trạng thái</th>
+                            <th style="width: 100px;">Lượt xem</th>
+                            <th style="width: 140px;">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="post : ${posts}">
+                            <td>
+                                <img th:src="${post.thumbnailUrl != null ? post.thumbnailUrl : 'https://via.placeholder.com/50'}"
+                                     alt="Thumbnail" class="thumbnail-sm">
+                            </td>
+                            <td>
+                                <strong th:text="${post.title}">Tiêu đề</strong><br>
+                                <small class="text-muted" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}">Date</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border" th:text="${post.categoryName}">Danh mục</span>
+                            </td>
+                            <td>
+                                <small th:text="${post.authorName}"></small>
+                            </td>
+                            <td>
+                                        <span class="badge"
+                                              th:classappend="${
+                                                post.status.name() == 'PUBLISHED' ? 'badge-status-published' :
+                                                (post.status.name() == 'PENDING' ? 'badge-status-processing' :
+                                                (post.status.name() == 'DRAFT' ? 'badge-status-draft' : 'badge-status-hidden'))
+                                              }"
+                                              th:text="${post.status}">STATUS</span>
+                            </td>
+                            <td>
+                                <i class="fas fa-eye"></i> <span th:text="${post.viewCount}">0</span>
+                            </td>
+                            <td>
+                                <div th:if="${isAdmin or post.authorId == currentUserId}" class="btn-group-sm">
+                                    <a th:href="@{/admin/posts/{id}/detail(id=${post.id})}"
+                                       class="btn btn-sm btn-info text-white"
+                                       style="margin-right: 4px;"
+                                       title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    <a th:href="@{/admin/posts/{id}/edit(id=${post.id})}" class="btn btn-warning" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+                                    <a th:href="@{/admin/posts/{id}/delete(id=${post.id})}"
+                                       class="btn btn-danger"
+                                       onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.')" title="Xóa">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+
+                                <span th:unless="${isAdmin or post.authorId == currentUserId}" class="text-muted small">
+                                            <i class="fas fa-lock"></i> Chỉ xem
+                                        </span>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(posts)}">
+                            <td colspan="7" class="text-center py-4 text-muted">Không tìm thấy bài viết nào.</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer" th:if="${totalPages > 1}">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${currentPageNum == 0} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/posts(page=${currentPageNum - 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}">Trước</a>
+                            </li>
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${i == currentPageNum} ? 'active'">
+                                <a class="page-link" th:href="@{/admin/posts(page=${i}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}" th:text="${i + 1}">1</a>
+                            </li>
+                            <li class="page-item" th:classappend="${currentPageNum == totalPages - 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/posts(page=${currentPageNum + 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+</body>
+</html>

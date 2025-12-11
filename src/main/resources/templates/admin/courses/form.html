@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="page-title" th:text="${pageTitle}">Thêm/Sửa Khóa học</h1>
+            </div>
+
+            <form th:action="@{/admin/courses/save}" th:object="${course}" method="POST"
+                  enctype="multipart/form-data" class="form-layout" novalidate>
+
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Thông tin chung</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="name" class="form-label">Tên khóa học <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="slug" class="form-label">Đường dẫn (Slug)</label>
+                                    <input type="text" class="form-control" id="slug" th:field="*{slug}" placeholder="tu-dong-tao-tu-ten">
+                                    <small class="text-muted">Để trống sẽ tự động tạo từ tên khóa học.</small>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="summary" class="form-label">Mô tả ngắn (Summary)</label>
+                                    <textarea class="form-control" id="summary" th:field="*{summary}" rows="3"></textarea>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="content" class="form-label">Nội dung chi tiết</label>
+                                    <textarea class="form-control editor" id="content" th:field="*{content}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Xuất bản</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-check form-switch mb-3">
+                                    <input class="form-check-input" type="checkbox" id="isActive" th:field="*{isActive}">
+                                    <label class="form-check-label" for="isActive">Kích hoạt (Hiển thị)</label>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save"></i> Lưu lại
+                                    </button>
+                                    <a th:href="@{/admin/courses}" class="btn btn-secondary">Quay lại</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Thuộc tính khóa học</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="categoryId" class="form-label">Danh mục</label>
+                                    <select class="form-select" id="categoryId" th:field="*{categoryId}">
+                                        <option value="" selected>-- Chọn danh mục --</option>
+                                        <option th:each="cat : ${categories}"
+                                                th:value="${cat.id}"
+                                                th:text="${cat.name}">Category Name</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="duration" class="form-label">Thời lượng</label>
+                                    <input type="text" class="form-control" id="duration" th:field="*{duration}" placeholder="VD: 05 buổi, 3 tháng...">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="targetAudience" class="form-label">Đối tượng tham gia</label>
+                                    <input type="text" class="form-control" id="targetAudience" th:field="*{targetAudience}" placeholder="VD: Cán bộ, Sinh viên...">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="trainingFormat" class="form-label">Hình thức đào tạo</label>
+                                    <select class="form-select" id="trainingFormat" th:field="*{trainingFormat}">
+                                        <option value="Offline">Trực tiếp (Offline)</option>
+                                        <option value="Online">Trực tuyến (Online)</option>
+                                        <option value="Hybrid">Kết hợp (Hybrid)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Ảnh đại diện (Thumbnail)</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="logo-preview mb-3">
+                                    <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : 'https://via.placeholder.com/300x200?text=No+Image'}"
+                                         alt="Thumbnail Preview" id="imagePreview"
+                                         style="max-height: 200px; width: auto; object-fit: cover;">
+                                </div>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
+<script>
+    // Init CKEditor
+    ClassicEditor.create(document.querySelector('.editor'))
+        .catch(error => console.error(error));
+
+    // Auto generate slug from name
+    document.addEventListener("DOMContentLoaded", () => {
+        // Hàm autoGenerateSlug đã có trong admin.js, chỉ cần gọi
+        if (typeof autoGenerateSlug === "function") {
+            autoGenerateSlug('name', 'slug');
+        }
+
+        // Init Image Preview (custom for this form if needed, or rely on admin.js)
+        const imageInput = document.getElementById('image');
+        if(imageInput){
+            imageInput.addEventListener('change', function(){
+                const preview = document.getElementById('imagePreview');
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => preview.src = e.target.result;
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+    });
+</script>
+
+</body>
+</html>

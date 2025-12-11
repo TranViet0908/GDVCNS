@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center">
+    <div class="container animate__animated animate__fadeInDown">
+        <span class="badge bg-accent mb-2 px-3 py-2 rounded-pill">Khóa học</span>
+        <h1 th:text="${service.name}" class="display-5 fw-bold text-white mb-3">Tên khóa học</h1>
+
+        <nav aria-label="breadcrumb" class="d-flex justify-content-center">
+            <ol class="breadcrumb mb-0 p-2 rounded-pill bg-white bg-opacity-10 backdrop-blur">
+                <li class="breadcrumb-item"><a th:href="@{/}" class="text-white text-decoration-none">Trang chủ</a></li>
+                <li class="breadcrumb-item"><a th:href="@{/khoa-hoc}" class="text-white text-decoration-none">Khóa học</a></li>
+                <li class="breadcrumb-item active text-white-50" aria-current="page">Chi tiết</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 animate-on-scroll">
+                <div class="position-relative mb-5">
+                    <img th:src="${service.thumbnailUrl != null ? service.thumbnailUrl : 'https://via.placeholder.com/800x400'}"
+                         class="img-fluid rounded-4 shadow-lg w-100"
+                         th:alt="${service.name}">
+                    <div class="position-absolute bottom-0 start-0 w-100 h-50 bg-gradient-to-t from-black-50 to-transparent rounded-bottom-4"></div>
+                </div>
+
+                <div class="ps-lg-3">
+                    <h3 class="mb-4 fw-bold text-primary border-start border-5 border-primary ps-3">Giới thiệu khóa học</h3>
+                    <p class="lead text-muted fst-italic mb-5" th:text="${service.summary}">Mô tả tóm tắt...</p>
+
+                    <div class="formatted-content text-dark" th:utext="${service.content}">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4 animate-on-scroll" data-delay="200">
+                <div class="card shadow-lg border-0 rounded-4 sticky-top overflow-hidden" style="top: 100px; z-index: 10;">
+                    <div class="card-header bg-primary text-white p-4 text-center">
+                        <h5 class="fw-bold mb-0 text-uppercase ls-1">Thông tin khóa học</h5>
+                    </div>
+                    <div class="card-body p-4 bg-light">
+                        <ul class="list-unstyled mb-4">
+                            <li class="mb-3 pb-3 border-bottom d-flex align-items-center">
+                                <div class="icon-box bg-white text-accent rounded-circle shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="far fa-clock"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Thời lượng</small>
+                                    <span class="fw-bold text-dark" th:text="${service.duration}">05 buổi</span>
+                                </div>
+                            </li>
+                            <li class="mb-3 pb-3 border-bottom d-flex align-items-center">
+                                <div class="icon-box bg-white text-accent rounded-circle shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-video"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Hình thức</small>
+                                    <span class="fw-bold text-dark" th:text="${service.trainingFormat}">Online</span>
+                                </div>
+                            </li>
+                            <li class="mb-3 pb-3 border-bottom d-flex align-items-center">
+                                <div class="icon-box bg-white text-accent rounded-circle shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Đối tượng</small>
+                                    <span class="fw-bold text-dark" th:text="${service.targetAudience}">Mọi đối tượng</span>
+                                </div>
+                            </li>
+                            <li class="mb-0 d-flex align-items-center" th:if="${service.category != null}">
+                                <div class="icon-box bg-white text-accent rounded-circle shadow-sm me-3 d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-folder-open"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted d-block text-uppercase fw-bold" style="font-size: 0.7rem;">Danh mục</small>
+                                    <span class="fw-bold text-dark" th:text="${service.category.name}">Công nghệ</span>
+                                </div>
+                            </li>
+                        </ul>
+
+                        <a th:href="@{/lien-he(subject='Đăng ký khóa học: ' + ${service.name})}"
+                           class="btn btn-modern btn-primary-modern w-100 py-3 fw-bold text-uppercase shadow-hover">
+                            Đăng Ký Ngay <i class="fas fa-arrow-right ms-2"></i>
+                        </a>
+                        <p class="text-center mt-3 mb-0 small text-muted">Hỗ trợ tư vấn 24/7</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

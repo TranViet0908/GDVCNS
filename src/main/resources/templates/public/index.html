@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+
+    <div class="container hero-content">
+        <div class="row align-items-center gx-5">
+            <div class="col-lg-6 order-2 order-lg-1">
+                <h1 class="hero-title-static animate__animated animate__fadeInLeft">
+                    Kiến Tạo <span class="highlight">Năng Lực Số</span><br>
+                     <span class="text-nowrap">Cho Giáo Dục Việt Nam</span>
+                </h1>
+
+                <p class="hero-desc animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                    GDVCNS tiên phong đổi mới sáng tạo, cung cấp giải pháp công nghệ toàn diện,
+                    giúp hàng triệu người Việt tiếp cận tri thức trong kỷ nguyên số.
+                </p>
+
+                <div class="hero-btns d-flex gap-3 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                    <a th:href="@{/gioi-thieu}" class="btn btn-modern btn-primary-modern">
+                        Về Chúng Tôi <i class="fas fa-arrow-right ms-2"></i>
+                    </a>
+                    <a th:href="@{/lien-he}" class="btn btn-modern btn-outline-modern">
+                        Liên Hệ Ngay
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-6 order-1 order-lg-2 mb-4 mb-lg-0 text-center">
+                <div class="hero-img-wrapper animate__animated animate__fadeInRight">
+                    <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?q=80&w=800&auto=format&fit=crop"
+                         class="hero-img shadow-lg"
+                         style="border-radius: 20px; border: 1px solid rgba(255,255,255,0.2);"
+                         alt="Digital Education Illustration">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding bg-white-section">
+    <div class="container">
+        <div class="text-center mb-5 animate-on-scroll">
+            <span class="section-label">Đào tạo & Dịch vụ</span>
+            <h2 class="section-heading">Chương Trình Nổi Bật</h2>
+            <div class="mx-auto" style="width: 60px; height: 4px; background: var(--accent); border-radius: 2px;"></div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6 col-lg-4 animate-on-scroll"
+                 th:each="course, iter : ${courses}"
+                 th:attr="data-delay=${iter.index * 100}">
+
+                <div class="card-modern">
+                    <div class="card-img-wrapper" style="height: 220px; overflow: hidden; position: relative;">
+                        <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : 'https://via.placeholder.com/400x250'}"
+                             alt="Thumbnail" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div class="position-absolute top-0 end-0 m-3">
+                            <span class="badge bg-primary shadow-sm" th:text="${course.trainingFormat}">Online</span>
+                        </div>
+                    </div>
+                    <div class="card-body-modern">
+                        <h3 class="card-title-modern fs-5 mb-2">
+                            <a th:href="@{/khoa-hoc/{slug}(slug=${course.slug})}" th:text="${course.name}">Tên khóa học</a>
+                        </h3>
+                        <p class="text-muted small line-clamp-3 mb-3" th:text="${course.summary}">Mô tả...</p>
+                        <div class="d-flex justify-content-between align-items-center border-top pt-3">
+                            <small class="text-muted fw-bold"><i class="far fa-clock me-1 text-accent"></i> <span th:text="${course.duration}">5 buổi</span></small>
+                            <a th:href="@{/khoa-hoc/{slug}(slug=${course.slug})}" class="text-accent fw-bold small text-decoration-none">
+                                Chi tiết <i class="fas fa-arrow-right ms-1"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding bg-light-section">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6 animate-on-scroll">
+                <div class="position-relative ps-4 pt-4">
+                    <div class="position-absolute top-0 start-0 w-100 h-100 rounded-4" style="background: var(--accent); transform: translate(-15px, -15px); opacity: 0.1; z-index: 0;"></div>
+                    <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80"
+                         class="img-fluid rounded-4 position-relative shadow-lg"
+                         style="z-index: 1;" alt="About Us">
+                </div>
+            </div>
+            <div class="col-lg-6 ps-lg-5 mt-5 mt-lg-0 animate-on-scroll" data-delay="200">
+                <span class="section-label">Về chúng tôi</span>
+                <h2 class="section-heading">Đối Tác Tin Cậy Trong Kỷ Nguyên Số</h2>
+                <div class="text-muted mb-4 fs-5"
+                     th:utext="${#strings.abbreviate(globalConfigs['site_intro'], 350)}">
+                </div>
+
+                <div class="row g-4 mb-4">
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center p-3 bg-white rounded-3 shadow-sm border border-light">
+                            <i class="fas fa-rocket text-accent fs-3 me-3"></i>
+                            <span class="fw-bold text-dark">Đổi mới sáng tạo</span>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="d-flex align-items-center p-3 bg-white rounded-3 shadow-sm border border-light">
+                            <i class="fas fa-laptop-code text-accent fs-3 me-3"></i>
+                            <span class="fw-bold text-dark">Công nghệ tiên tiến</span>
+                        </div>
+                    </div>
+                </div>
+
+                <a th:href="@{/gioi-thieu}" class="btn btn-modern btn-primary-modern">Tìm hiểu thêm</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="section-padding bg-white-section">
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-end mb-5 animate-on-scroll">
+            <div>
+                <span class="section-label">Tin tức & Sự kiện</span>
+                <h2 class="section-heading mb-0">Hoạt Động Mới Nhất</h2>
+            </div>
+            <a th:href="@{/tin-tuc}" class="btn btn-outline-primary rounded-pill px-4 fw-bold">Xem tất cả</a>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-4 animate-on-scroll"
+                 th:each="post, iter : ${posts}"
+                 th:attr="data-delay=${iter.index * 100}">
+
+                <div class="card-modern">
+                    <div class="card-img-wrapper" style="height: 200px;">
+                        <img th:src="${post.thumbnailUrl != null ? post.thumbnailUrl : 'https://via.placeholder.com/400x250'}" alt="News" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                    <div class="card-body-modern">
+                        <div class="d-flex align-items-center mb-2">
+                            <i class="far fa-calendar-alt text-accent me-2"></i>
+                            <span class="text-muted small" th:text="${#temporals.format(post.publishedAt, 'dd/MM/yyyy')}">Date</span>
+                        </div>
+                        <h4 class="card-title-modern fs-5">
+                            <a th:href="@{/tin-tuc/{slug}(slug=${post.slug})}" th:text="${post.title}">Tiêu đề bài viết</a>
+                        </h4>
+                        <p class="text-muted small line-clamp-3 mb-0" th:text="${post.summary}">Tóm tắt...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="py-5 text-center text-white position-relative"
+         style="background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);">
+    <div class="container animate-on-scroll position-relative" style="z-index: 2;">
+        <h2 class="fw-bold mb-3 display-5">Sẵn Sàng Chuyển Đổi Số?</h2>
+        <p class="lead mb-4 text-white-50">Hãy để GDVCNS đồng hành cùng bạn trên con đường chinh phục công nghệ.</p>
+        <a th:href="@{/lien-he}" class="btn btn-light btn-lg rounded-pill px-5 text-dark fw-bold shadow-lg hover-scale">
+            Liên Hệ Ngay
+        </a>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

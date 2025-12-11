@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<header th:fragment="header" class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container-fluid">
+        <a class="navbar-brand d-flex align-items-center" th:href="@{/}">
+            <img th:src="${siteLogo}" alt="Logo" class="logo-img bg-white rounded p-1" style="height: 40px;">
+            <span class="ms-2 brand-text text-white fw-bold" th:text="${siteName}">GDVCNS</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" th:href="@{/}">Trang chủ</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/gioi-thieu}">Giới thiệu</a></li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="servicesDropdown" role="button" data-bs-toggle="dropdown">
+                        Khóa học
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="servicesDropdown">
+                        <li th:each="service : ${services}">
+                            <a class="dropdown-item" th:href="@{/khoa-hoc/danh-muc/{slug}(slug=${service.slug})}"
+                               th:text="${service.name}">Tên danh mục</a>
+                        </li>
+                    </ul>
+                </li>
+
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="newsDropdown" role="button" data-bs-toggle="dropdown">
+                        Tin tức
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="newsDropdown">
+                        <li th:each="cat : ${newsCategories}">
+                            <a class="dropdown-item" th:href="@{/tin-tuc/danh-muc/{slug}(slug=${cat.slug})}"
+                               th:text="${cat.name}">Tên danh mục tin</a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/cau-hoi-thuong-gap}">FAQ</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/lien-he}">Liên hệ</a></li>
+            </ul>
+        </div>
+    </div>
+</header>
+
+</body>
+</html>

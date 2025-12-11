@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<footer th:fragment="footer" class="footer-modern">
+    <div class="container">
+        <div class="row gy-5">
+            <div class="col-lg-4 col-md-6">
+                <div class="d-flex align-items-center mb-4">
+                    <h4 class="fw-bold text-white m-0" th:text="${siteName}">GDVCNS</h4>
+                </div>
+                <p class="footer-desc">
+                    Công ty Cổ phần Giáo dục và Công nghệ số Việt Nam. Tiên phong kiến tạo nền tảng giáo dục số và giải pháp công nghệ toàn diện.
+                </p>
+
+                <div class="social-group mt-4 d-flex align-items-center gap-3">
+                    <a th:href="${socialFacebook}" target="_blank" class="social-btn" title="Facebook">
+                        <i class="fab fa-facebook-f"></i>
+                    </a>
+                    <a th:href="${socialYoutube}" target="_blank" class="social-btn" title="Youtube">
+                        <i class="fab fa-youtube"></i>
+                    </a>
+                    <a th:href="${socialZalo}" target="_blank" class="social-btn" title="Zalo Liên hệ">
+                        <i class="fas fa-comments"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-heading">Khám phá</h5>
+                <ul class="list-unstyled">
+                    <li><a th:href="@{/}" class="footer-link">Trang chủ</a></li>
+                    <li><a th:href="@{/gioi-thieu}" class="footer-link">Về chúng tôi</a></li>
+                    <li><a th:href="@{/khoa-hoc}" class="footer-link">Khóa học</a></li>
+                    <li><a th:href="@{/du-an}" class="footer-link">Dự án tiêu biểu</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-2 col-md-6">
+                <h5 class="footer-heading">Hỗ trợ</h5>
+                <ul class="list-unstyled">
+                    <li><a th:href="@{/tin-tuc}" class="footer-link">Tin tức & Sự kiện</a></li>
+                    <li><a th:href="@{/lien-he}" class="footer-link">Liên hệ tư vấn</a></li>
+                    <li><a th:href="@{/chinh-sach-bao-mat}" class="footer-link">Chính sách bảo mật</a></li>
+                    <li><a th:href="@{/dieu-khoan-su-dung}" class="footer-link">Điều khoản sử dụng</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-6">
+                <h5 class="footer-heading">Liên hệ</h5>
+                <ul class="list-unstyled footer-contact">
+                    <li>
+                        <i class="fas fa-map-marker-alt"></i>
+                        <span th:text="${siteAddress}">Hà Nội, Việt Nam</span>
+                    </li>
+                    <li>
+                        <i class="fas fa-phone-alt"></i>
+                        <a th:href="|tel:${sitePhone}|" th:text="${sitePhone}" class="text-decoration-none text-white-50 hover-accent">0926...</a>
+                    </li>
+                    <li>
+                        <i class="fas fa-envelope"></i>
+                        <a th:href="|mailto:${siteEmail}|" th:text="${siteEmail}" class="text-decoration-none text-white-50 hover-accent">admin@...</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom mt-5 pt-4 border-top border-white-10">
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="mb-0 small text-white-50">&copy; 2025 <span th:text="${siteName}">GDVCNS</span>. All rights reserved.</p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <p class="mb-0 small text-white-50">Designed by GDVCNS Tech Team</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+
+</body>
+</html>

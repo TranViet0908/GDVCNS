@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+            <div class="content-header d-flex align-items-center gap-3">
+                <a th:href="@{/admin/categories}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i></a>
+                <h1 class="page-title mb-0" th:text="${category.id} ? 'Cập nhật danh mục' : 'Thêm danh mục mới'">Thêm danh mục mới</h1>
+            </div>
+
+            <form th:action="${category.id} ? @{/admin/categories/{id}(id=${category.id})} : @{/admin/categories}"
+                  th:object="${category}"
+                  method="POST" class="form-layout" novalidate>
+
+                <div class="row">
+                    <div class="col-lg-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title">Thông tin danh mục</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}"
+                                           placeholder="Ví dụ: Tin tức sự kiện" required>
+                                    <div class="invalid-feedback">Vui lòng nhập tên danh mục.</div>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="slug" class="form-label">Slug</label>
+                                    <input type="text" class="form-control" id="slug" th:field="*{slug}"
+                                           placeholder="Tu-dong-tao-tu-ten">
+                                    <small class="text-muted">Để trống hệ thống sẽ tự tạo từ tên.</small>
+                                </div>
+
+                                <div class="form-group mb-0">
+                                    <label for="type" class="form-label">Loại danh mục <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="type" th:field="*{type}" required>
+                                        <option value="POST">Bài viết (Tin tức)</option>
+                                        <option value="COURSE">Khóa học (Đào tạo)</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Cấu hình</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-0">
+                                    <label for="parentId" class="form-label">Danh mục cha</label>
+                                    <select class="form-select" id="parentId" th:field="*{parentId}">
+                                        <option value="">-- Là danh mục gốc --</option>
+                                        <option th:each="cat : ${categories}"
+                                                th:value="${cat.id}"
+                                                th:text="${cat.name}"
+                                                th:selected="${cat.id == category.parentId}">
+                                        </option>
+                                    </select>
+                                    <small class="text-muted d-block mt-2">Chọn nếu danh mục này thuộc về một mục lớn hơn.</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="btn-group w-100">
+                            <button type="submit" class="btn btn-primary w-100">
+                                <i class="fas fa-save"></i> Lưu lại
+                            </button>
+                            <a th:href="@{/admin/categories}" class="btn btn-secondary w-100">Hủy</a>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        // Kiểm tra xem hàm autoGenerateSlug có trong admin.js chưa
+        if (typeof window.autoGenerateSlug === 'function') {
+            window.autoGenerateSlug('name', 'slug');
+        } else {
+            // Fallback đơn giản nếu chưa load admin.js
+            const nameIn = document.getElementById('name');
+            const slugIn = document.getElementById('slug');
+            if(nameIn && slugIn){
+                nameIn.addEventListener('input', function() {
+                    if(!slugIn.value) {
+                         const slug = this.value.toLowerCase().trim()
+                            .replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+                         slugIn.value = slug;
+                    }
+                });
+            }
+        }
+
+        // Hiện toast lỗi nếu có (từ redirectAttributes)
+        const errorMessage = "[[${errorMessage}]]";
+        if (errorMessage && errorMessage !== 'null' && errorMessage !== '') {
+            showToast(errorMessage, 'error');
+        }
+    });
+</script>
+</body>
+
+</html>

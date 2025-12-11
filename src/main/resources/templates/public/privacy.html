@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center">
+    <div class="container animate__animated animate__fadeInDown">
+        <h1 class="display-4 fw-bold mb-3">Chính Sách Bảo Mật</h1>
+        <p class="lead text-white-50 mx-auto" style="max-width: 600px;">
+            Cam kết bảo vệ thông tin cá nhân và quyền riêng tư của khách hàng tại GDVCNS.
+        </p>
+    </div>
+</section>
+
+<section class="section-padding bg-white">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8 animate-on-scroll">
+                <div class="formatted-content text-dark fs-6 lh-lg">
+                    <p class="fw-bold">Cập nhật lần cuối: 12/09/2025</p>
+                    <p>Chào mừng bạn đến với <strong>Công ty Cổ phần Giáo dục và Công nghệ số Việt Nam (GDVCNS)</strong>. Chúng tôi hiểu rằng quyền riêng tư của bạn là quan trọng. Chính sách này giải thích cách chúng tôi thu thập, sử dụng và bảo vệ thông tin của bạn.</p>
+
+                    <h4 class="mt-4 fw-bold text-primary">1. Thu thập thông tin cá nhân</h4>
+                    <p>Chúng tôi thu thập thông tin khi bạn đăng ký khóa học, điền form liên hệ hoặc đăng ký nhận bản tin. Các thông tin bao gồm:</p>
+                    <ul>
+                        <li>Họ và tên.</li>
+                        <li>Địa chỉ email, số điện thoại.</li>
+                        <li>Thông tin đơn vị công tác (nếu đăng ký theo tổ chức).</li>
+                    </ul>
+
+                    <h4 class="mt-4 fw-bold text-primary">2. Phạm vi sử dụng thông tin</h4>
+                    <p>Thông tin thu thập được sẽ chỉ được sử dụng cho các mục đích sau:</p>
+                    <ul>
+                        <li>Tư vấn và cung cấp dịch vụ khóa học, dự án phù hợp.</li>
+                        <li>Gửi thông báo về lịch học, tài liệu, hoặc thay đổi chính sách.</li>
+                        <li>Cải thiện chất lượng dịch vụ và hỗ trợ khách hàng.</li>
+                    </ul>
+
+                    <h4 class="mt-4 fw-bold text-primary">3. Bảo mật thông tin</h4>
+                    <p>GDVCNS cam kết không bán, trao đổi hoặc chia sẻ thông tin cá nhân của bạn cho bên thứ ba, ngoại trừ trường hợp có yêu cầu từ cơ quan pháp luật hoặc để cung cấp dịch vụ (ví dụ: đơn vị cấp chứng chỉ liên kết).</p>
+                    <p>Hệ thống của chúng tôi áp dụng các biện pháp bảo mật kỹ thuật số để ngăn chặn truy cập trái phép.</p>
+
+                    <h4 class="mt-4 fw-bold text-primary">4. Quyền lợi của khách hàng</h4>
+                    <p>Bạn có quyền yêu cầu chúng tôi chỉnh sửa hoặc xóa thông tin cá nhân của mình khỏi hệ thống bất cứ lúc nào bằng cách liên hệ qua email: <a href="mailto:haanh12899@gmail.com">haanh12899@gmail.com</a>.</p>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mt-5 mt-lg-0 animate-on-scroll" data-delay="200">
+                <div class="card-modern border-0 shadow-sm p-4 sticky-top bg-light" style="top: 100px;">
+                    <h5 class="fw-bold mb-3">Bạn cần hỗ trợ?</h5>
+                    <p class="text-muted small">Nếu có thắc mắc về chính sách bảo mật, vui lòng liên hệ trực tiếp với chúng tôi.</p>
+                    <hr>
+                    <ul class="list-unstyled">
+                        <li class="mb-3"><i class="fas fa-envelope text-accent me-2"></i> admin@gdvcns.vn</li>
+                        <li class="mb-3"><i class="fas fa-phone text-accent me-2"></i> 0926 262 898</li>
+                        <li><i class="fas fa-map-marker-alt text-accent me-2"></i> Linh Đàm, Hoàng Mai, Hà Nội</li>
+                    </ul>
+                    <a th:href="@{/lien-he}" class="btn btn-outline-primary w-100 rounded-pill mt-3">Liên hệ ngay</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

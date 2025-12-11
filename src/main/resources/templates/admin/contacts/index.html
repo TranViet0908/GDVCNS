@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="page-title">Quản lý Liên hệ</h1>
+                    <p class="page-subtitle">Danh sách phản hồi từ khách hàng</p>
+                </div>
+                <a th:href="@{/admin/contacts/create}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Tạo liên hệ mới
+                </a>
+            </div>
+
+            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${successMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${errorMessage}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <form method="GET" th:action="@{/admin/contacts}" class="row g-3">
+                        <div class="col-md-4">
+                            <input type="text" name="keyword" class="form-control"
+                                   placeholder="Tìm tên, email, sđt..."
+                                   th:value="${keyword}">
+                        </div>
+                        <div class="col-md-3">
+                            <select name="status" class="form-select" onchange="this.form.submit()">
+                                <option value="" th:selected="${currentStatus == null}">-- Tất cả trạng thái --</option>
+                                <option value="NEW" th:selected="${currentStatus != null && currentStatus.name() == 'NEW'}">Mới</option>
+                                <option value="PROCESSING" th:selected="${currentStatus != null && currentStatus.name() == 'PROCESSING'}">Đang xử lý</option>
+                                <option value="DONE" th:selected="${currentStatus != null && currentStatus.name() == 'DONE'}">Đã xong</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <button type="submit" class="btn btn-secondary w-100">
+                                <i class="fas fa-search"></i> Tìm
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                        <tr>
+                            <th>Họ tên</th>
+                            <th>Điện thoại</th>
+                            <th>Email</th>
+                            <th>Chủ đề</th>
+                            <th>Trạng thái</th>
+                            <th>Ngày tạo</th>
+                            <th class="text-end">Hành động</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:if="${contacts.empty}">
+                            <td colspan="7" class="text-center py-4">Không tìm thấy dữ liệu nào.</td>
+                        </tr>
+
+                        <tr th:each="contact : ${contacts}">
+                            <td><strong th:text="${contact.fullName}">Tên</strong></td>
+                            <td th:text="${contact.phone}">Phone</td>
+                            <td th:text="${contact.email}">Email</td>
+                            <td th:text="${contact.subject}">Subject</td>
+                            <td>
+                                        <span class="badge"
+                                              th:classappend="${
+                                                  contact.status.name() == 'NEW' ? 'bg-primary' :
+                                                  (contact.status.name() == 'PROCESSING' ? 'bg-warning text-dark' : 'bg-success')
+                                              }"
+                                              th:text="${contact.status}">NEW</span>
+                            </td>
+                            <td th:text="${#temporals.format(contact.createdAt, 'dd/MM/yyyy HH:mm')}">Date</td>
+                            <td class="text-end">
+                                <a th:href="@{/admin/contacts/edit/{id}(id=${contact.id})}"
+                                   class="btn btn-sm btn-info" title="Xem/Sửa">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a th:href="@{/admin/contacts/delete/{id}(id=${contact.id})}"
+                                   class="btn btn-sm btn-danger"
+                                   title="Xóa"
+                                   onclick="return confirm('Bạn có chắc chắn muốn xóa liên hệ này không? Hành động này không thể hoàn tác.')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card-footer" th:if="${totalPages > 1}">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center mb-0">
+                            <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/contacts(page=${currentPage - 1}, keyword=${keyword}, status=${currentStatus})}">Trước</a>
+                            </li>
+
+                            <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link"
+                                   th:href="@{/admin/contacts(page=${i}, keyword=${keyword}, status=${currentStatus})}"
+                                   th:text="${i + 1}">1</a>
+                            </li>
+
+                            <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+                                <a class="page-link" th:href="@{/admin/contacts(page=${currentPage + 1}, keyword=${keyword}, status=${currentStatus})}">Sau</a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+</body>
+</html>

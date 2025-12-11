@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
+
+<script src="https://cdn.tiny.cloud/1/8kcytgvx85dtatwqk0acxy6uav5fuxh81rljreti0fy5idej/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+
+<body class="admin-layout">
+<div class="layout-wrapper">
+    <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
+
+    <div class="layout-container">
+        <header th:insert="~{layouts/dashboard/header :: header}"></header>
+
+        <main class="main-content">
+            <div class="content-header">
+                <h1 class="page-title">Cấu hình Hệ thống</h1>
+                <p class="page-subtitle">Quản lý thông tin công ty (Dữ liệu từ CSDL)</p>
+            </div>
+
+            <div th:if="${message}" class="alert alert-success alert-dismissible fade show" role="alert">
+                <span th:text="${message}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show" role="alert">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form method="POST" th:action="@{/admin/config}" enctype="multipart/form-data">
+                <div class="row">
+                    <div class="col-lg-8">
+
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h5 class="card-title">Thông tin Cơ bản</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Tên công ty (Tiếng Việt)</label>
+                                    <input type="text" class="form-control" name="company_name_vi"
+                                           th:value="${configs['company_name_vi']}">
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Tên công ty (Tiếng Anh)</label>
+                                    <input type="text" class="form-control" name="company_name_en"
+                                           th:value="${configs['company_name_en']}">
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Hotline</label>
+                                        <input type="tel" class="form-control" name="hotline"
+                                               th:value="${configs['hotline']}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Email liên hệ</label>
+                                        <input type="email" class="form-control" name="email"
+                                               th:value="${configs['email']}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Mã số thuế</label>
+                                        <input type="text" class="form-control" name="tax_code"
+                                               th:value="${configs['tax_code']}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Người đại diện</label>
+                                        <input type="text" class="form-control" name="representative"
+                                               th:value="${configs['representative']}">
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Vốn điều lệ</label>
+                                        <input type="text" class="form-control" name="charter_capital"
+                                               th:value="${configs['charter_capital']}">
+                                    </div>
+                                    <div class="col-md-6 mb-3">
+                                        <label class="form-label">Ngày thành lập</label>
+                                        <input type="date" class="form-control" name="founded_date"
+                                               th:value="${configs['founded_date']}">
+                                    </div>
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Địa chỉ trụ sở</label>
+                                    <textarea class="form-control" name="headquarters" rows="2"
+                                              th:text="${configs['headquarters']}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card mb-4">
+                            <div class="card-header bg-light">
+                                <h5 class="card-title text-primary mb-0">Nội dung Trang Giới thiệu</h5>
+                            </div>
+                            <div class="card-body">
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Giới thiệu chung</label>
+                                    <textarea class="form-control tiny-editor" name="site_intro"
+                                              th:text="${configs['site_intro']}"></textarea>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Tầm nhìn</label>
+                                    <textarea class="form-control tiny-editor" name="site_vision"
+                                              th:text="${configs['site_vision']}"></textarea>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Sứ mệnh</label>
+                                    <textarea class="form-control tiny-editor" name="site_mission"
+                                              th:text="${configs['site_mission']}"></textarea>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label fw-bold">Giá trị cốt lõi</label>
+                                    <textarea class="form-control tiny-editor" name="site_core_values"
+                                              th:text="${configs['site_core_values']}"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-lg-4">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h5 class="card-title">Hình ảnh nhận diện</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Logo công ty</label>
+                                    <div class="logo-preview mb-2 text-center p-2 border rounded"
+                                         style="background: #f8f9fa;">
+                                        <img th:if="${configs['site_logo'] != null}"
+                                             th:src="${configs['site_logo']}"
+                                             alt="Logo" style="max-height: 80px; max-width: 100%;">
+                                        <span th:if="${configs['site_logo'] == null}" class="text-muted">Chưa có logo</span>
+                                    </div>
+                                    <input type="file" class="form-control" name="file_logo" accept="image/*">
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Favicon</label>
+                                    <div class="logo-preview mb-2 text-center p-2 border rounded">
+                                        <img th:if="${configs['site_favicon'] != null}"
+                                             th:src="${configs['site_favicon']}"
+                                             alt="Favicon" style="width: 32px; height: 32px;">
+                                        <span th:if="${configs['site_favicon'] == null}" class="text-muted">Chưa có</span>
+                                    </div>
+                                    <input type="file" class="form-control" name="file_favicon" accept="image/*">
+                                </div>
+
+                                <hr>
+                                <button type="submit" class="btn btn-primary w-100 btn-lg">
+                                    <i class="fas fa-save me-2"></i> Lưu Cấu Hình
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script>
+    tinymce.init({
+        selector: '.tiny-editor', // Chọn tất cả thẻ có class tiny-editor
+        plugins: 'lists link code wordcount', // Bỏ bớt plugin ảnh/media cho gọn
+        toolbar: 'undo redo | bold italic | bullist numlist | alignleft aligncenter | removeformat | code',
+        height: 250, // Chiều cao vừa phải
+        menubar: false, // Ẩn thanh menu bar ở trên cùng cho gọn
+        statusbar: false // Ẩn thanh status bar ở dưới cùng
+    });
+</script>
+
+</body>
+</html>

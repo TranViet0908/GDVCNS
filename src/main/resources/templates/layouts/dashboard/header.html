@@ -1,0 +1,33 @@
+<header class="topbar" th:fragment="header" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="topbar-left">
+        <div class="breadcrumb-wrapper" th:if="${breadcrumb}">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Trang chủ</a></li>
+                    <li class="breadcrumb-item active" th:text="${breadcrumb}"></li>
+                </ol>
+            </nav>
+        </div>
+    </div>
+
+    <div class="topbar-right">
+        <a href="/" target="_blank" class="btn-view-site" title="Xem trang web">
+            <i class="fas fa-external-link-alt"></i>
+            <span>Xem trang web</span>
+        </a>
+
+        <div class="dropdown user-dropdown">
+            <button class="btn-user" type="button" data-bs-toggle="dropdown">
+                <img src="https://via.placeholder.com/32" class="avatar-sm" alt="Avatar">
+                <span class="user-name" th:text="${#authentication.name}">Admin</span>
+                <i class="fas fa-chevron-down"></i>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ cá nhân</a></li>
+                <li><a class="dropdown-item" href="#"><i class="fas fa-lock"></i> Đổi mật khẩu</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+            </ul>
+        </div>
+    </div>
+</header>

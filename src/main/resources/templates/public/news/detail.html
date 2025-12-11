@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head th:insert="~{layouts/public/head :: head}"></head>
+
+<body>
+<header th:insert="~{layouts/public/header :: header}"></header>
+
+<section class="page-header text-center" style="padding-bottom: 80px;">
+    <div class="container animate__animated animate__fadeInDown">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <span class="badge bg-accent bg-opacity-100 mb-3 px-3 py-2 rounded-pill shadow-sm"
+                      th:text="${news.categoryName}">Tin tức</span>
+                <h1 th:text="${news.title}" class="fw-bold display-5 text-white mb-3">Tiêu đề bài viết</h1>
+                <div class="text-white-50 d-flex justify-content-center align-items-center gap-3">
+                    <span><i class="far fa-calendar-alt me-2"></i><span th:text="${#temporals.format(news.publishedAt, 'dd/MM/yyyy')}">Date</span></span>
+                    <span class="opacity-50">|</span>
+                    <span><i class="far fa-eye me-2"></i><span th:text="${news.viewCount}">0</span> lượt xem</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="news-detail py-5 bg-white position-relative" style="margin-top: -60px; z-index: 2; border-radius: 40px 40px 0 0;">
+    <div class="container pt-4">
+        <div class="row">
+            <div class="col-lg-9 mx-auto animate-on-scroll">
+                <img th:src="${news.thumbnailUrl}"
+                     class="img-fluid rounded-4 mb-5 w-100 shadow-lg"
+                     th:if="${news.thumbnailUrl != null}" th:alt="${news.title}">
+
+                <div class="news-body formatted-content text-dark lh-lg fs-5" th:utext="${news.content}">
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center mt-5 pt-4 border-top">
+                    <span class="fw-bold text-muted">Chia sẻ bài viết:</span>
+                    <div class="d-flex gap-2">
+                        <button class="btn btn-outline-primary rounded-circle" style="width: 40px; height: 40px;"><i class="fab fa-facebook-f"></i></button>
+                        <button class="btn btn-outline-info rounded-circle" style="width: 40px; height: 40px;"><i class="fab fa-twitter"></i></button>
+                        <button class="btn btn-outline-danger rounded-circle" style="width: 40px; height: 40px;"><i class="fab fa-pinterest"></i></button>
+                    </div>
+                </div>
+
+                <div class="mt-5 pt-5">
+                    <h3 class="fw-bold mb-4 border-start border-4 border-primary ps-3">Bài viết liên quan</h3>
+                    <div class="row g-4">
+                        <div class="col-md-6" th:each="related : ${relatedNews}">
+                            <div class="card-modern h-100 p-3 d-flex flex-row align-items-center">
+                                <img th:src="${related.thumbnailUrl != null ? related.thumbnailUrl : 'https://via.placeholder.com/100'}"
+                                     class="rounded-3 me-3 object-fit-cover"
+                                     style="width: 90px; height: 70px;" alt="Thumb">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">
+                                        <a th:href="@{/tin-tuc/{slug}(slug=${related.slug})}"
+                                           class="text-decoration-none text-dark hover-accent line-clamp-2"
+                                           th:text="${related.title}">Title</a>
+                                    </h6>
+                                    <small class="text-muted" th:text="${#temporals.format(related.publishedAt, 'dd/MM/yyyy')}">Date</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer th:insert="~{layouts/public/footer :: footer}" class="footer-modern"></footer>
+<div th:insert="~{layouts/public/scripts :: scripts}"></div>
+</body>
+</html>

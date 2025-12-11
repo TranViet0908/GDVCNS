@@ -1,0 +1,89 @@
+<nav class="sidebar" th:fragment="nav" xmlns:th="http://www.w3.org/1999/xhtml">
+    <div class="sidebar-header">
+        <div class="logo-wrapper">
+            <div class="logo-icon">V</div>
+            <span class="logo-text">GDVCNS Admin</span>
+        </div>
+    </div>
+
+    <div class="user-info">
+        <div class="avatar">
+            <i class="fas fa-user-circle"></i>
+        </div>
+        <div class="user-details">
+            <span class="user-name" th:text="${#authentication.name}">Admin</span>
+            <span class="user-role" th:text="${#authentication.authorities[0].authority.replace('ROLE_', '')}">Administrator</span>
+        </div>
+    </div>
+
+    <div class="menu-divider"></div>
+
+    <ul class="menu-list">
+        <li>
+            <a th:href="@{/admin/dashboard}" th:classappend="${currentPage == 'dashboard' ? 'active' : ''}">
+                <i class="fas fa-chart-line"></i>
+                <span class="menu-text">Dashboard</span>
+            </a>
+        </li>
+
+        <li class="menu-header">
+            <span class="menu-title">Quản lý Nội dung</span>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/posts}" th:classappend="${currentPage == 'posts' ? 'active' : ''}">
+                <i class="fas fa-newspaper"></i>
+                <span class="menu-text">Bài viết</span>
+            </a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/categories}" th:classappend="${currentPage == 'categories' ? 'active' : ''}">
+                <i class="fas fa-folder"></i>
+                <span class="menu-text">Danh mục</span>
+            </a>
+        </li>
+
+        <li>
+            <a th:href="@{/admin/courses}" th:classappend="${currentPage == 'courses' ? 'active' : ''}">
+                <i class="fas fa-graduation-cap"></i>
+                <span class="menu-text">Khóa học / Đào tạo</span>
+            </a>
+        </li>
+
+        <li class="menu-header">
+            <span class="menu-title">Khách hàng</span>
+        </li>
+        <li>
+            <a th:href="@{/admin/faqs}" th:classappend="${pageTitle == 'Quản lý FAQ' ? 'active' : ''}">
+                <i class="fas fa-question-circle"></i>
+                <span class="menu-text">Quản lý FAQ</span>
+            </a>
+        </li>
+        <li>
+            <a th:href="@{/admin/contacts}" th:classappend="${currentPage == 'contacts' ? 'active' : ''}">
+                <i class="fas fa-envelope"></i>
+                <span class="menu-text">Liên hệ</span>
+                <span class="badge bg-danger ms-auto" th:if="${newContacts != null && newContacts > 0}" th:text="${newContacts}"></span>
+            </a>
+        </li>
+
+        <li class="menu-header" sec:authorize="hasRole('ADMIN')">
+            <span class="menu-title">Hệ thống</span>
+        </li>
+
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/users}" th:classappend="${currentPage == 'users' ? 'active' : ''}">
+                <i class="fas fa-users"></i>
+                <span class="menu-text">Tài khoản</span>
+            </a>
+        </li>
+
+        <li sec:authorize="hasRole('ADMIN')">
+            <a th:href="@{/admin/config}" th:classappend="${currentPage == 'config' ? 'active' : ''}">
+                <i class="fas fa-sliders-h"></i>
+                <span class="menu-text">Cấu hình</span>
+            </a>
+        </li>
+    </ul>
+</nav>
