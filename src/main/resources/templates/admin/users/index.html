@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
 
@@ -11,133 +11,151 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-                <span th:text="${successMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-            <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
-                <span th:text="${errorMessage}"></span>
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
+            <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
 
-            <div class="content-header d-flex justify-content-between align-items-center">
+            <div class="content-header d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="page-title">Quản lý Tài khoản</h1>
-                    <p class="page-subtitle">Danh sách nhân viên và quyền hạn</p>
+                    <p class="page-subtitle">Danh sách nhân viên và phân quyền hệ thống</p>
                 </div>
-                <a th:href="@{/admin/users/new}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Thêm tài khoản
+                <a th:href="@{/admin/users/new}" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-user-plus me-2"></i> Thêm tài khoản
                 </a>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <form th:action="@{/admin/users}" method="get" class="row g-3">
-                        <div class="col-md-4">
-                            <input type="text" name="keyword" class="form-control"
-                                   placeholder="Tìm tên, email hoặc username..."
-                                   th:value="${keyword}">
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" name="role">
-                                <option value="">-- Tất cả quyền --</option>
-                                <option th:each="r : ${roles}"
-                                        th:value="${r}"
-                                        th:text="${r}"
-                                        th:selected="${r == roleParam}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <select class="form-select" name="status">
-                                <option value="">-- Tất cả trạng thái --</option>
-                                <option th:each="s : ${statuses}"
-                                        th:value="${s}"
-                                        th:text="${s}"
-                                        th:selected="${s == statusParam}"></option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-secondary w-100">
-                                <i class="fas fa-search"></i> Lọc
-                            </button>
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <form th:action="@{/admin/users}" method="get">
+                        <div class="row g-3 align-items-center">
+                            <div class="col-md-4">
+                                <div class="position-relative">
+                                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                    <input type="text" class="form-control ps-5" name="keyword"
+                                           th:value="${keyword}" placeholder="Tìm theo tên, email, username...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="role">
+                                    <option value="">-- Tất cả quyền --</option>
+                                    <option th:each="r : ${roles}"
+                                            th:value="${r}"
+                                            th:text="${r}"
+                                            th:selected="${r == roleParam}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-3">
+                                <select class="form-select" name="status">
+                                    <option value="">-- Tất cả trạng thái --</option>
+                                    <option th:each="s : ${statuses}"
+                                            th:value="${s}"
+                                            th:text="${s}"
+                                            th:selected="${s == statusParam}"></option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <button type="submit" class="btn btn-light w-100 border text-primary fw-bold">
+                                    <i class="fas fa-filter me-1"></i> Lọc
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
+            </div>
 
+            <div class="card border-0 shadow-sm">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
                         <tr>
-                            <th>Tên người dùng</th>
-                            <th>Email</th>
-                            <th>Quyền hạn</th>
-                            <th>Trạng thái</th>
-                            <th>Ngày tạo</th>
-                            <th>Hành động</th>
+                            <th style="width: 25%;" class="ps-4">Thành viên</th>
+                            <th style="width: 25%;">Email</th>
+                            <th style="width: 15%;" class="text-center">Vai trò</th>
+                            <th style="width: 15%;" class="text-center">Trạng thái</th>
+                            <th style="width: 20%;" class="text-end pe-4">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:if="${#lists.isEmpty(users)}">
-                            <td colspan="6" class="text-center py-4">Không tìm thấy dữ liệu nào.</td>
+                        <tr th:if="${users.empty}">
+                            <td colspan="5" class="text-center py-5">
+                                <div class="text-muted opacity-75">
+                                    <i class="fas fa-users-slash fa-3x mb-3"></i>
+                                    <p class="mb-0">Không tìm thấy tài khoản nào.</p>
+                                </div>
+                            </td>
                         </tr>
 
                         <tr th:each="user : ${users}">
-                            <td>
-                                <strong th:text="${user.fullName}">Tên</strong><br>
-                                <small class="text-muted" th:text="${'@' + user.username}">@username</small>
+                            <td class="ps-4">
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-sm bg-light text-primary rounded-circle d-flex align-items-center justify-content-center me-3 fw-bold border"
+                                         style="width: 40px; height: 40px; font-size: 16px;">
+                                        <span th:text="${#strings.substring(user.fullName, 0, 1)}">A</span>
+                                    </div>
+                                    <div>
+                                        <div class="fw-bold text-dark" th:text="${user.fullName}">Full Name</div>
+                                        <div class="small text-muted font-monospace" th:text="${'@' + user.username}">@username</div>
+                                    </div>
+                                </div>
                             </td>
-                            <td th:text="${user.email}">email@example.com</td>
-                            <td>
-                                        <span class="badge"
-                                              th:classappend="${user.role.name() == 'ADMIN' ? 'bg-danger' : 'bg-secondary'}"
-                                              th:text="${user.role}">ADMIN</span>
+                            <td class="text-muted" th:text="${user.email}">email@example.com</td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill"
+                                      th:classappend="${user.role.name() == 'ADMIN' ? 'bg-primary' : 'bg-info text-dark'}"
+                                      th:text="${user.role}">ROLE</span>
                             </td>
-                            <td>
-                                        <span class="badge"
-                                              th:classappend="${user.status.name() == 'ACTIVE' ? 'bg-success' : 'bg-warning text-dark'}"
-                                              th:text="${user.status}">Hoạt động</span>
+                            <td class="text-center">
+                                <span class="badge rounded-pill"
+                                      th:classappend="${user.status.name() == 'ACTIVE' ? 'bg-success' : 'bg-secondary'}"
+                                      th:text="${user.status.name() == 'ACTIVE' ? 'Hoạt động' : 'Đã khóa'}">Status</span>
                             </td>
-                            <td th:text="${#temporals.format(user.createdAt, 'dd/MM/yyyy HH:mm')}">01/12/2025</td>
-                            <td>
-                                <a th:href="@{/admin/users/{id}/edit(id=${user.id})}" class="btn btn-sm btn-warning" title="Sửa">
+                            <td class="text-end pe-4">
+                                <a th:href="@{/admin/users/{id}/edit(id=${user.id})}"
+                                   class="btn btn-sm btn-light text-primary me-1" title="Sửa">
                                     <i class="fas fa-edit"></i>
                                 </a>
 
-                                <a th:if="${user.status.name() == 'ACTIVE'}"
-                                   th:href="@{/admin/users/{id}/lock(id=${user.id})}"
-                                   class="btn btn-sm btn-danger"
-                                   title="Khóa tài khoản"
-                                   onclick="return confirm('Bạn có chắc muốn khóa tài khoản này?');">
+                                <button th:if="${user.status.name() == 'ACTIVE'}"
+                                        type="button" class="btn btn-sm btn-light text-danger"
+                                        th:data-id="${user.id}"
+                                        th:data-name="${user.username}"
+                                        onclick="openLockModal(this)"
+                                        title="Khóa tài khoản">
                                     <i class="fas fa-lock"></i>
-                                </a>
+                                </button>
 
-                                <a th:if="${user.status.name() == 'LOCKED'}"
-                                   th:href="@{/admin/users/{id}/unlock(id=${user.id})}"
-                                   class="btn btn-sm btn-success"
-                                   title="Mở khóa tài khoản"
-                                   onclick="return confirm('Mở khóa tài khoản này?');">
+                                <button th:if="${user.status.name() == 'LOCKED'}"
+                                        type="button" class="btn btn-sm btn-light text-success"
+                                        th:data-id="${user.id}"
+                                        th:data-name="${user.username}"
+                                        onclick="openUnlockModal(this)"
+                                        title="Mở khóa">
                                     <i class="fas fa-unlock"></i>
-                                </a>
+                                </button>
                             </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="card-footer" th:if="${totalPages > 1}">
+                <div class="card-footer bg-white border-top-0 py-3" th:if="${totalPages > 1}">
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center mb-0">
                             <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/users(page=${currentPage - 1}, keyword=${keyword}, role=${roleParam}, status=${statusParam})}">Trước</a>
+                                <a class="page-link rounded-pill px-3 mx-1" th:href="@{/admin/users(page=${currentPage - 1}, keyword=${keyword}, role=${roleParam}, status=${statusParam})}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
                             </li>
-
                             <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
-                                th:classappend="${currentPage == i} ? 'active'">
-                                <a class="page-link" th:href="@{/admin/users(page=${i}, keyword=${keyword}, role=${roleParam}, status=${statusParam})}" th:text="${i}">1</a>
+                                th:classappend="${i == currentPage} ? 'active'">
+                                <a class="page-link rounded-circle mx-1 d-flex align-items-center justify-content-center"
+                                   style="width: 36px; height: 36px;"
+                                   th:href="@{/admin/users(page=${i}, keyword=${keyword}, role=${roleParam}, status=${statusParam})}"
+                                   th:text="${i}">1</a>
                             </li>
-
                             <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/users(page=${currentPage + 1}, keyword=${keyword}, role=${roleParam}, status=${statusParam})}">Sau</a>
+                                <a class="page-link rounded-pill px-3 mx-1" th:href="@{/admin/users(page=${currentPage + 1}, keyword=${keyword}, role=${roleParam}, status=${statusParam})}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
                             </li>
                         </ul>
                     </nav>
@@ -147,6 +165,76 @@
     </div>
 </div>
 
+<div class="modal fade" id="lockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Khóa tài khoản?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-0">Người dùng <strong id="lockUserName" class="text-dark">username</strong> sẽ không thể đăng nhập vào hệ thống.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <a href="#" id="confirmLockBtn" class="btn btn-danger">
+                    <i class="fas fa-lock me-1"></i> Khóa ngay
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="unlockModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-success">Mở khóa tài khoản?</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-0">Khôi phục quyền truy cập cho <strong id="unlockUserName" class="text-dark">username</strong>.</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy</button>
+                <a href="#" id="confirmUnlockBtn" class="btn btn-success">
+                    <i class="fas fa-unlock me-1"></i> Mở khóa
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script th:inline="javascript">
+    // Xử lý Modal Khóa
+    function openLockModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        document.getElementById('lockUserName').textContent = name;
+        document.getElementById('confirmLockBtn').href = `/admin/users/${id}/lock`;
+        new bootstrap.Modal(document.getElementById('lockModal')).show();
+    }
+
+    // Xử lý Modal Mở khóa
+    function openUnlockModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        document.getElementById('unlockUserName').textContent = name;
+        document.getElementById('confirmUnlockBtn').href = `/admin/users/${id}/unlock`;
+        new bootstrap.Modal(document.getElementById('unlockModal')).show();
+    }
+
+    // Toast Messages
+    document.addEventListener('DOMContentLoaded', () => {
+        /*[[${successMessage}]]*/
+        const successMsg = [[${successMessage}]];
+        /*[[${errorMessage}]]*/
+        const errorMsg = [[${errorMessage}]];
+        if (successMsg) showToast(successMsg, 'success');
+        if (errorMsg) showToast(errorMsg, 'error');
+    });
+</script>
 </body>
 </html>

@@ -11,80 +11,103 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div class="content-header">
-                <h1 class="page-title" th:text="${contact.id == null ? 'Tạo liên hệ mới' : 'Chi tiết / Cập nhật Liên hệ'}">Title</h1>
+            <div class="content-header mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/admin/contacts}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h1 class="page-title mb-0" th:text="${contact.id == null ? 'Tạo liên hệ mới' : 'Chi tiết liên hệ'}">Title</h1>
+                        <p class="page-subtitle mb-0 text-muted">Xem và phản hồi thông tin từ khách hàng</p>
+                    </div>
+                </div>
             </div>
 
             <form th:action="@{/admin/contacts/save}" th:object="${contact}" method="POST">
                 <input type="hidden" th:field="*{id}">
 
-                <div class="row">
+                <div class="row g-4">
                     <div class="col-lg-8">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Thông tin liên hệ</h5>
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-user-circle me-2"></i>Thông tin Khách hàng</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="row mb-3">
+                            <div class="card-body p-4">
+                                <div class="row g-3 mb-4">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Họ tên <span class="text-danger">*</span></label>
-                                        <input type="text" class="form-control" th:field="*{fullName}" required placeholder="Nhập họ tên...">
+                                        <label class="form-label text-muted small text-uppercase fw-bold">Họ và tên</label>
+                                        <input type="text" class="form-control fw-bold" th:field="*{fullName}" required placeholder="Họ tên khách hàng">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Điện thoại</label>
-                                        <input type="text" class="form-control" th:field="*{phone}" placeholder="Nhập số điện thoại...">
+                                        <label class="form-label text-muted small text-uppercase fw-bold">Số điện thoại</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fas fa-phone"></i></span>
+                                            <input type="text" class="form-control" th:field="*{phone}" placeholder="Số điện thoại">
+                                        </div>
                                     </div>
-                                </div>
-
-                                <div class="row mb-3">
                                     <div class="col-md-6">
-                                        <label class="form-label fw-bold">Email</label>
-                                        <input type="email" class="form-control" th:field="*{email}" placeholder="Nhập email...">
+                                        <label class="form-label text-muted small text-uppercase fw-bold">Email</label>
+                                        <div class="input-group">
+                                            <span class="input-group-text bg-light"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" class="form-control" th:field="*{email}" placeholder="Email liên hệ">
+                                        </div>
                                     </div>
                                     <div class="col-md-6" th:if="${contact.createdAt != null}">
-                                        <label class="form-label fw-bold">Ngày gửi</label>
-                                        <input type="text" class="form-control"
+                                        <label class="form-label text-muted small text-uppercase fw-bold">Thời gian gửi</label>
+                                        <input type="text" class="form-control bg-light"
                                                th:value="${#temporals.format(contact.createdAt, 'dd/MM/yyyy HH:mm')}"
                                                disabled readonly>
                                     </div>
                                 </div>
 
+                                <hr class="border-light my-4">
+
                                 <div class="mb-3">
-                                    <label class="form-label fw-bold">Chủ đề</label>
-                                    <input type="text" class="form-control" th:field="*{subject}" placeholder="Nhập chủ đề...">
+                                    <label class="form-label text-muted small text-uppercase fw-bold">Chủ đề</label>
+                                    <input type="text" class="form-control" th:field="*{subject}" placeholder="Chủ đề tin nhắn">
                                 </div>
 
                                 <div class="mb-0">
-                                    <label class="form-label fw-bold">Nội dung tin nhắn</label>
-                                    <textarea class="form-control" rows="6" th:field="*{message}" placeholder="Nội dung khách hàng gửi..."></textarea>
+                                    <label class="form-label text-muted small text-uppercase fw-bold">Nội dung tin nhắn</label>
+                                    <textarea class="form-control bg-light" rows="6" th:field="*{message}" placeholder="Nội dung khách hàng gửi..." readonly></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-4">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Trạng thái & Hành động</h5>
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-tasks me-2"></i>Xử lý</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="mb-3">
-                                    <label class="form-label">Trạng thái xử lý</label>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label class="form-label fw-bold">Trạng thái hiện tại</label>
                                     <select class="form-select" th:field="*{status}">
-                                        <option value="NEW">Mới</option>
-                                        <option value="PROCESSING">Đang xử lý</option>
-                                        <option value="DONE">Đã hoàn thành</option>
+                                        <option value="NEW">✨ Mới tiếp nhận</option>
+                                        <option value="PROCESSING">⏳ Đang xử lý</option>
+                                        <option value="DONE">✅ Đã hoàn thành</option>
                                     </select>
                                 </div>
 
-                                <hr>
-
-                                <button type="submit" class="btn btn-primary w-100 mb-2">
-                                    <i class="fas fa-save"></i> Lưu dữ liệu
+                                <button type="submit" class="btn btn-primary w-100 mb-3 py-2 fw-bold shadow-sm">
+                                    <i class="fas fa-save me-2"></i> Cập nhật trạng thái
                                 </button>
 
-                                <a th:href="@{/admin/contacts}" class="btn btn-secondary w-100">
-                                    <i class="fas fa-arrow-left"></i> Quay lại danh sách
+                                <a th:href="@{/admin/contacts}" class="btn btn-light w-100 border">
+                                    Quay lại danh sách
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm" th:if="${contact.email != null}">
+                            <div class="card-body p-4">
+                                <h6 class="fw-bold mb-3">Phản hồi nhanh</h6>
+                                <a th:href="'mailto:' + ${contact.email}" class="btn btn-outline-primary w-100 mb-2">
+                                    <i class="fas fa-paper-plane me-2"></i> Gửi Email trả lời
+                                </a>
+                                <a th:href="'tel:' + ${contact.phone}" class="btn btn-outline-success w-100">
+                                    <i class="fas fa-phone me-2"></i> Gọi điện thoại
                                 </a>
                             </div>
                         </div>

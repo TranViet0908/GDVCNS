@@ -1,98 +1,154 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layouts/dashboard/head :: head}"></head>
 
-<body>
-<nav th:replace="~{layouts/dashboard/sidebar :: nav}"></nav>
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
 
-<div class="layout-container">
+<body class="admin-layout">
+<div class="layout-wrapper">
+  <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
 
-  <header th:replace="~{layouts/dashboard/header :: header}"></header>
+  <div class="layout-container">
+    <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
-  <main class="main-content">
-    <div class="content-header d-flex justify-content-between align-items-center">
-      <div>
-        <h1 class="page-title">Quản lý FAQ</h1>
-        <p class="page-subtitle">Danh sách câu hỏi thường gặp</p>
+    <main class="main-content">
+      <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+      <div class="content-header d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="page-title">Quản lý FAQ</h1>
+          <p class="page-subtitle">Danh sách câu hỏi thường gặp hiển thị trên website</p>
+        </div>
+        <a th:href="@{/admin/faqs/add}" class="btn btn-primary shadow-sm">
+          <i class="fas fa-plus me-2"></i> Thêm câu hỏi mới
+        </a>
       </div>
-      <a th:href="@{/admin/faqs/add}" class="btn btn-primary">
-        <i class="fas fa-plus"></i> Thêm mới
-      </a>
-    </div>
 
-    <div class="card mb-4">
-      <div class="card-body">
-        <form th:action="@{/admin/faqs}" method="get" class="row g-3 align-items-center">
-          <div class="col-md-10">
-            <div class="input-group">
-              <span class="input-group-text bg-light"><i class="fas fa-search"></i></span>
-              <input type="text" class="form-control" name="keyword"
-                     th:value="${keyword}" placeholder="Nhập từ khóa tìm kiếm...">
+      <div class="card mb-4 border-0 shadow-sm">
+        <div class="card-body py-3">
+          <form th:action="@{/admin/faqs}" method="get">
+            <div class="row align-items-center">
+              <div class="col-md-6">
+                <div class="position-relative">
+                  <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                  <input type="text" class="form-control ps-5" name="keyword"
+                         th:value="${keyword}" placeholder="Nhập từ khóa tìm kiếm (câu hỏi, nội dung)...">
+                </div>
+              </div>
+              <div class="col-md-2">
+                <button type="submit" class="btn btn-light w-100 border text-primary fw-bold">
+                  <i class="fas fa-search me-1"></i> Tìm kiếm
+                </button>
+              </div>
+              <div class="col-md-2" th:if="${keyword}">
+                <a th:href="@{/admin/faqs}" class="btn btn-link text-danger text-decoration-none w-100">
+                  <i class="fas fa-times me-1"></i> Xóa lọc
+                </a>
+              </div>
             </div>
-          </div>
-          <div class="col-md-2">
-            <button type="submit" class="btn btn-primary w-100">Tìm kiếm</button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
 
-    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
-      <i class="fas fa-check-circle me-2"></i> <span th:text="${successMessage}"></span>
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-
-    <div class="card">
-      <div class="card-body p-0">
+      <div class="card border-0 shadow-sm">
         <div class="table-responsive">
-          <table class="table table-hover mb-0">
-            <thead>
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
             <tr>
-              <th style="width: 5%">STT</th>
-              <th style="width: 30%">Câu hỏi</th>
-              <th style="width: 35%">Câu trả lời</th>
-              <th style="width: 10%" class="text-center">Thứ tự</th>
-              <th style="width: 10%" class="text-center">Trạng thái</th>
-              <th style="width: 10%" class="text-center">Hành động</th>
+              <th style="width: 50px;" class="text-center">#</th>
+              <th style="width: 35%;">Câu hỏi</th>
+              <th style="width: 35%;">Câu trả lời (Tóm tắt)</th>
+              <th style="width: 10%;" class="text-center">Thứ tự</th>
+              <th style="width: 10%;" class="text-center">Trạng thái</th>
+              <th style="width: 10%;" class="text-end pe-4">Hành động</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="faq, iter : ${faqs}">
-              <td th:text="${iter.count}">1</td>
-              <td class="fw-bold" th:text="${faq.question}">Question?</td>
-              <td class="text-muted small" th:utext="${#strings.abbreviate(faq.answer, 80)}">Answer...</td>
-              <td class="text-center">
-                <span class="badge bg-light text-dark border" th:text="${faq.orderIndex}">1</span>
-              </td>
-              <td class="text-center">
-                <span th:if="${faq.isActive}" class="badge badge-status-published">Hiển thị</span>
-                <span th:unless="${faq.isActive}" class="badge badge-status-draft">Ẩn</span>
-              </td>
-              <td class="text-center">
-                <a th:href="@{/admin/faqs/edit/{id}(id=${faq.id})}" class="btn btn-info btn-sm text-white" title="Sửa">
-                  <i class="fas fa-edit"></i>
-                </a>
-                <a th:href="@{/admin/faqs/delete/{id}(id=${faq.id})}"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Bạn có chắc chắn muốn xóa?');" title="Xóa">
-                  <i class="fas fa-trash"></i>
-                </a>
+            <tr th:if="${faqs.empty}">
+              <td colspan="6" class="text-center py-5">
+                <div class="text-muted opacity-75">
+                  <i class="fas fa-question-circle fa-3x mb-3"></i>
+                  <p class="mb-0">Chưa có câu hỏi nào.</p>
+                </div>
               </td>
             </tr>
-            <tr th:if="${faqs.empty}">
-              <td colspan="6" class="text-center py-5 text-muted">
-                <i class="fas fa-folder-open fa-3x mb-3 text-gray-300"></i><br>
-                Không tìm thấy dữ liệu nào phù hợp.
+
+            <tr th:each="faq, iter : ${faqs}">
+              <td class="text-center text-muted" th:text="${iter.count}">1</td>
+              <td>
+                <span class="fw-bold text-dark" th:text="${faq.question}">Câu hỏi?</span>
+              </td>
+              <td>
+                <div class="text-muted small text-truncate" style="max-width: 300px;"
+                     th:text="${#strings.abbreviate(faq.answer, 80)}">Nội dung...</div>
+              </td>
+              <td class="text-center">
+                <span class="badge bg-light text-dark border font-monospace" th:text="${faq.orderIndex}">1</span>
+              </td>
+              <td class="text-center">
+                                <span class="badge rounded-pill"
+                                      th:classappend="${faq.isActive ? 'bg-success' : 'bg-secondary'}"
+                                      th:text="${faq.isActive ? 'Hiển thị' : 'Đang ẩn'}">Status</span>
+              </td>
+              <td class="text-end pe-4">
+                <a th:href="@{/admin/faqs/edit/{id}(id=${faq.id})}"
+                   class="btn btn-sm btn-light text-primary me-1" title="Sửa">
+                  <i class="fas fa-edit"></i>
+                </a>
+                <button type="button" class="btn btn-sm btn-light text-danger"
+                        th:data-id="${faq.id}"
+                        th:data-name="${faq.question}"
+                        onclick="openDeleteModal(this)"
+                        title="Xóa">
+                  <i class="fas fa-trash-alt"></i>
+                </button>
               </td>
             </tr>
             </tbody>
           </table>
         </div>
       </div>
-    </div>
-  </main>
+    </main>
+  </div>
 </div>
 
-<div th:replace="~{layouts/dashboard/scripts :: scripts}"></div>
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title fw-bold text-danger">Xác nhận xóa</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <p class="text-muted mb-0">Bạn có chắc chắn muốn xóa câu hỏi này?</p>
+        <p class="fw-bold text-dark mt-2 mb-0" id="deleteItemName">Question text</p>
+      </div>
+      <div class="modal-footer border-0 pt-0">
+        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+        <button type="button" class="btn btn-danger delete-confirm-btn">
+          <i class="fas fa-trash-alt me-1"></i> Xóa
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script th:inline="javascript">
+  function openDeleteModal(button) {
+      const id = button.getAttribute('data-id');
+      const name = button.getAttribute('data-name');
+      document.getElementById('deleteItemName').textContent = name;
+      deleteWithModal(name, function() {
+          window.location.href = `/admin/faqs/delete/${id}`;
+      });
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+      /*[[${successMessage}]]*/
+      const successMsg = [[${successMessage}]];
+      if (successMsg) showToast(successMsg, 'success');
+  });
+</script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
 
@@ -11,47 +11,46 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div class="content-header d-flex justify-content-between align-items-center">
-                <div>
-                    <h1 class="page-title">Chi tiết Khóa học</h1>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb mb-0">
-                            <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Dashboard</a></li>
-                            <li class="breadcrumb-item"><a th:href="@{/admin/courses}">Khóa học</a></li>
-                            <li class="breadcrumb-item active" th:text="${course.name}">Tên khóa</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div class="d-flex gap-2">
-                    <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn btn-warning">
-                        <i class="fas fa-edit"></i> Chỉnh sửa
-                    </a>
-                    <a th:href="@{/admin/courses}" class="btn btn-secondary">
-                        <i class="fas fa-arrow-left"></i> Quay lại
+            <div class="content-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <a th:href="@{/admin/courses}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-arrow-left text-muted"></i>
+                        </a>
+                        <div>
+                            <h1 class="page-title mb-0">Chi tiết Khóa học</h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0 small">
+                                    <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}" class="text-decoration-none">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a th:href="@{/admin/courses}" class="text-decoration-none">Khóa học</a></li>
+                                    <li class="breadcrumb-item active text-muted" th:text="${course.name}">Tên khóa</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
+                    <a th:href="@{/admin/courses/edit/{id}(id=${course.id})}" class="btn btn-warning shadow-sm">
+                        <i class="fas fa-edit me-2"></i> Chỉnh sửa
                     </a>
                 </div>
             </div>
 
-            <div class="row">
+            <div class="row g-4">
                 <div class="col-lg-8">
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0">Nội dung khóa học</h5>
-                        </div>
-                        <div class="card-body">
-                            <h2 class="mb-3" th:text="${course.name}">Tên khóa học</h2>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="mb-3 text-primary" th:text="${course.name}">Tên Khóa Học</h2>
 
-                            <div class="mb-4">
-                                <h6 class="text-muted text-uppercase small fw-bold">Mô tả ngắn</h6>
-                                <p class="lead fs-6" th:text="${course.summary}">Mô tả ngắn...</p>
+                            <div class="mb-4 p-3 bg-light rounded border-start border-4 border-info">
+                                <h6 class="text-muted text-uppercase small fw-bold mb-2">Mô tả ngắn</h6>
+                                <p class="mb-0 fst-italic text-dark" th:text="${course.summary}">Chưa có mô tả...</p>
                             </div>
 
-                            <hr>
+                            <hr class="my-4">
 
-                            <div>
-                                <h6 class="text-muted text-uppercase small fw-bold mb-3">Nội dung chi tiết</h6>
-                                <div class="editor-content" th:utext="${course.content}">
-                                    Nội dung bài viết sẽ hiển thị ở đây...
+                            <div class="course-content">
+                                <h5 class="fw-bold mb-3 border-bottom pb-2">Nội dung chi tiết</h5>
+                                <div class="editor-content lh-lg text-dark" th:utext="${course.content}">
+                                    Nội dung đang cập nhật...
                                 </div>
                             </div>
                         </div>
@@ -59,64 +58,61 @@
                 </div>
 
                 <div class="col-lg-4">
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0">Ảnh đại diện</h5>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-image me-2"></i>Ảnh đại diện</h6>
                         </div>
-                        <div class="card-body text-center">
-                            <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : 'https://via.placeholder.com/300x200'}"
-                                 class="img-fluid rounded border"
-                                 style="max-height: 250px; width: 100%; object-fit: cover;" alt="Thumbnail">
+                        <div class="card-body p-0">
+                            <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : 'https://via.placeholder.com/400x250?text=No+Thumbnail'}"
+                                 class="img-fluid w-100" style="max-height: 250px; object-fit: cover;" alt="Course Thumbnail">
                         </div>
                     </div>
 
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0">Thông tin chi tiết</h5>
+                    <div class="card border-0 shadow-sm mb-4">
+                        <div class="card-header bg-white py-3">
+                            <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-info-circle me-2"></i>Thông tin chi tiết</h6>
                         </div>
-                        <div class="card-body">
+                        <div class="card-body p-0">
                             <ul class="list-group list-group-flush">
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <li class="list-group-item d-flex justify-content-between px-4 py-3">
                                     <span class="text-muted">Trạng thái</span>
-                                    <span th:if="${course.isActive}" class="badge badge-status-published">Đang hoạt động</span>
-                                    <span th:unless="${course.isActive}" class="badge badge-status-hidden">Đang ẩn</span>
+                                    <span class="badge rounded-pill"
+                                          th:classappend="${course.isActive ? 'bg-success' : 'bg-secondary'}"
+                                          th:text="${course.isActive ? 'Công khai' : 'Ẩn'}">Status</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span class="text-muted">Danh mục</span>
-                                    <span class="fw-medium" th:text="${course.categoryName != null ? course.categoryName : 'Chưa phân loại'}">--</span>
+                                <li class="list-group-item px-4 py-3">
+                                    <span class="text-muted d-block mb-1 small text-uppercase">Danh mục</span>
+                                    <span class="fw-bold text-dark" th:text="${course.categoryName != null ? course.categoryName : 'Chưa phân loại'}">--</span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
-                                    <span class="text-muted">Slug</span>
+                                <li class="list-group-item px-4 py-3">
+                                    <span class="text-muted d-block mb-1 small text-uppercase">Slug (URL)</span>
                                     <code class="text-primary" th:text="${course.slug}">slug-name</code>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <li class="list-group-item d-flex justify-content-between px-4 py-3">
                                     <span class="text-muted">Thời lượng</span>
-                                    <span class="fw-medium" th:text="${course.duration}">--</span>
+                                    <span class="fw-medium text-dark"><i class="far fa-clock me-2"></i><span th:text="${course.duration}">--</span></span>
                                 </li>
-                                <li class="list-group-item d-flex justify-content-between align-items-center px-0">
+                                <li class="list-group-item d-flex justify-content-between px-4 py-3">
                                     <span class="text-muted">Hình thức</span>
-                                    <span class="badge bg-info text-dark" th:text="${course.trainingFormat}">--</span>
+                                    <span class="fw-medium text-info"><i class="fas fa-laptop-house me-2"></i><span th:text="${course.trainingFormat}">--</span></span>
                                 </li>
-                                <li class="list-group-item px-0">
-                                    <span class="text-muted d-block mb-1">Đối tượng tham gia</span>
-                                    <span class="fw-medium" th:text="${course.targetAudience}">--</span>
+                                <li class="list-group-item px-4 py-3">
+                                    <span class="text-muted d-block mb-1 small text-uppercase">Đối tượng</span>
+                                    <span class="fw-medium text-dark"><i class="fas fa-users me-2"></i><span th:text="${course.targetAudience}">--</span></span>
                                 </li>
                             </ul>
                         </div>
                     </div>
 
-                    <div class="card mb-4">
-                        <div class="card-header bg-light">
-                            <h5 class="card-title mb-0">Hệ thống</h5>
-                        </div>
-                        <div class="card-body text-sm">
-                            <div class="mb-2">
-                                <span class="text-muted">Ngày tạo:</span><br>
-                                <span class="fw-medium" th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy HH:mm')}">--</span>
+                    <div class="card border-0 shadow-sm bg-light">
+                        <div class="card-body p-4 small text-muted">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span>Ngày tạo:</span>
+                                <span class="fw-medium text-dark" th:text="${#temporals.format(course.createdAt, 'dd/MM/yyyy HH:mm')}">--</span>
                             </div>
-                            <div class="mb-2">
-                                <span class="text-muted">Lượt xem:</span><br>
-                                <span class="fw-medium" th:text="${course.viewCount}">0</span>
+                            <div class="d-flex justify-content-between">
+                                <span>Lượt xem:</span>
+                                <span class="fw-medium text-dark" th:text="${course.viewCount}">0</span>
                             </div>
                         </div>
                     </div>

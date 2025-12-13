@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
 
@@ -11,75 +11,94 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
-
-            <div class="content-header d-flex align-items-center gap-3">
-                <a th:href="@{/admin/categories}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i></a>
-                <h1 class="page-title mb-0" th:text="${category.id} ? 'Cập nhật danh mục' : 'Thêm danh mục mới'">Thêm danh mục mới</h1>
+            <div class="content-header mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/admin/categories}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h1 class="page-title mb-0" th:text="${category.id} ? 'Cập nhật danh mục' : 'Thêm danh mục mới'">Thêm danh mục</h1>
+                        <p class="page-subtitle mb-0 text-muted">Điền thông tin chi tiết cho danh mục</p>
+                    </div>
+                </div>
             </div>
 
             <form th:action="${category.id} ? @{/admin/categories/{id}(id=${category.id})} : @{/admin/categories}"
                   th:object="${category}"
-                  method="POST" class="form-layout" novalidate>
+                  method="POST" novalidate>
 
-                <div class="row">
+                <div class="row g-4">
                     <div class="col-lg-8">
-                        <div class="card">
-                            <div class="card-header">
-                                <h5 class="card-title">Thông tin danh mục</h5>
+                        <div class="card h-100">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-info-circle me-2"></i>Thông tin chung</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
+                            <div class="card-body p-4">
+                                <div class="mb-4">
                                     <label for="name" class="form-label">Tên danh mục <span class="text-danger">*</span></label>
                                     <input type="text" class="form-control" id="name" th:field="*{name}"
-                                           placeholder="Ví dụ: Tin tức sự kiện" required>
+                                           placeholder="Nhập tên danh mục (Ví dụ: Tin công nghệ)" required>
                                     <div class="invalid-feedback">Vui lòng nhập tên danh mục.</div>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="slug" class="form-label">Slug</label>
-                                    <input type="text" class="form-control" id="slug" th:field="*{slug}"
-                                           placeholder="Tu-dong-tao-tu-ten">
-                                    <small class="text-muted">Để trống hệ thống sẽ tự tạo từ tên.</small>
+                                <div class="mb-4">
+                                    <label for="slug" class="form-label">Đường dẫn tĩnh (Slug)</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-muted">/</span>
+                                        <input type="text" class="form-control" id="slug" th:field="*{slug}"
+                                               placeholder="tu-dong-tao-tu-ten">
+                                    </div>
+                                    <div class="form-text text-muted small mt-2">
+                                        <i class="fas fa-magic me-1"></i> Để trống để hệ thống tự động tạo từ tên danh mục.
+                                    </div>
                                 </div>
 
-                                <div class="form-group mb-0">
-                                    <label for="type" class="form-label">Loại danh mục <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="type" th:field="*{type}" required>
-                                        <option value="POST">Bài viết (Tin tức)</option>
-                                        <option value="COURSE">Khóa học (Đào tạo)</option>
-                                    </select>
+                                <div class="mb-0">
+                                    <label for="description" class="form-label">Mô tả</label>
+                                    <textarea class="form-control" id="description" rows="4" placeholder="Mô tả ngắn về danh mục này..."></textarea>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="col-lg-4">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Cấu hình</h5>
-                            </div>
+                        <div class="card mb-4">
                             <div class="card-body">
-                                <div class="form-group mb-0">
-                                    <label for="parentId" class="form-label">Danh mục cha</label>
+                                <button type="submit" class="btn btn-primary w-100 mb-2 fw-bold">
+                                    <i class="fas fa-save me-2"></i> Lưu thay đổi
+                                </button>
+                                <a th:href="@{/admin/categories}" class="btn btn-light w-100 border">Hủy bỏ</a>
+                            </div>
+                        </div>
+
+                        <div class="card">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-cog me-2"></i>Cấu hình</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <div class="mb-4">
+                                    <label for="type" class="form-label fw-bold small text-uppercase text-muted">Loại danh mục</label>
+                                    <select class="form-select" id="type" th:field="*{type}" required>
+                                        <option value="POST">Bài viết (Tin tức)</option>
+                                        <option value="COURSE">Khóa học (Đào tạo)</option>
+                                    </select>
+                                </div>
+
+                                <div class="mb-0">
+                                    <label for="parentId" class="form-label fw-bold small text-uppercase text-muted">Danh mục cha</label>
                                     <select class="form-select" id="parentId" th:field="*{parentId}">
-                                        <option value="">-- Là danh mục gốc --</option>
+                                        <option value="">-- Không có (Danh mục gốc) --</option>
                                         <option th:each="cat : ${categories}"
                                                 th:value="${cat.id}"
                                                 th:text="${cat.name}"
                                                 th:selected="${cat.id == category.parentId}">
                                         </option>
                                     </select>
-                                    <small class="text-muted d-block mt-2">Chọn nếu danh mục này thuộc về một mục lớn hơn.</small>
+                                    <div class="form-text mt-2">
+                                        Chọn danh mục cha để tạo cấu trúc phân cấp.
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="btn-group w-100">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-save"></i> Lưu lại
-                            </button>
-                            <a th:href="@{/admin/categories}" class="btn btn-secondary w-100">Hủy</a>
                         </div>
                     </div>
                 </div>
@@ -92,31 +111,47 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
-        // Kiểm tra xem hàm autoGenerateSlug có trong admin.js chưa
+        // Tự động tạo slug (Sử dụng hàm từ admin.js nếu có)
         if (typeof window.autoGenerateSlug === 'function') {
             window.autoGenerateSlug('name', 'slug');
         } else {
-            // Fallback đơn giản nếu chưa load admin.js
+            // Fallback thủ công nếu chưa load admin.js
             const nameIn = document.getElementById('name');
             const slugIn = document.getElementById('slug');
             if(nameIn && slugIn){
                 nameIn.addEventListener('input', function() {
-                    if(!slugIn.value) {
+                    // Logic tạo slug đơn giản
+                    if (!slugIn.value || slugIn.value === slugIn.getAttribute('data-old')) {
                          const slug = this.value.toLowerCase().trim()
-                            .replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').replace(/^-+|-+$/g, '');
+                            .replace(/[^\w\s-]/g, '')
+                            .replace(/[\s_-]+/g, '-')
+                            .replace(/^-+|-+$/g, '');
                          slugIn.value = slug;
                     }
                 });
             }
         }
 
-        // Hiện toast lỗi nếu có (từ redirectAttributes)
+        // Form Validation (Bootstrap style)
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+            }, false);
+        });
+
+        // Toast Error Display
         const errorMessage = "[[${errorMessage}]]";
         if (errorMessage && errorMessage !== 'null' && errorMessage !== '') {
-            showToast(errorMessage, 'error');
+            if (typeof showToast === 'function') {
+                showToast(errorMessage, 'error');
+            }
         }
     });
 </script>
 </body>
-
 </html>

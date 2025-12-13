@@ -1,70 +1,110 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="~{layouts/dashboard/head :: head}"></head>
 
-<body>
-<nav th:replace="~{layouts/dashboard/sidebar :: nav}"></nav>
+<head th:insert="~{layouts/dashboard/head :: head}"></head>
 
-<div class="layout-container">
+<body class="admin-layout">
+<div class="layout-wrapper">
+  <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
 
-  <header th:replace="~{layouts/dashboard/header :: header}"></header>
+  <div class="layout-container">
+    <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
-  <main class="main-content">
-    <div class="content-header d-flex justify-content-between align-items-center">
-      <div>
-        <h1 class="page-title" th:text="${pageTitle}">Form FAQ</h1>
-      </div>
-      <a th:href="@{/admin/faqs}" class="btn btn-secondary">
-        <i class="fas fa-arrow-left"></i> Quay lại
-      </a>
-    </div>
-
-    <div class="row justify-content-center">
-      <div class="col-lg-8">
-        <div class="card">
-          <div class="card-body">
-            <form th:action="@{/admin/faqs/save}" th:object="${faq}" method="post">
-              <input type="hidden" th:field="*{id}">
-
-              <div class="form-group mb-3">
-                <label for="question" class="form-label">Câu hỏi <span class="text-danger">*</span></label>
-                <input type="text" class="form-control" id="question" th:field="*{question}" required
-                       placeholder="Ví dụ: Làm thế nào để đăng ký khóa học?">
-              </div>
-
-              <div class="form-group mb-3">
-                <label for="answer" class="form-label">Câu trả lời <span class="text-danger">*</span></label>
-                <textarea class="form-control" id="answer" th:field="*{answer}" rows="6" required
-                          placeholder="Nhập nội dung câu trả lời..."></textarea>
-                <div class="form-text">Có thể nhập HTML cơ bản (b, i, ul, li).</div>
-              </div>
-
-              <div class="row">
-                <div class="col-md-6 mb-3">
-                  <label for="orderIndex" class="form-label">Thứ tự hiển thị</label>
-                  <input type="number" class="form-control" id="orderIndex" th:field="*{orderIndex}">
-                </div>
-
-                <div class="col-md-6 mb-3 d-flex align-items-center pt-4">
-                  <div class="form-check form-switch">
-                    <input class="form-check-input" type="checkbox" id="isActive" th:field="*{isActive}">
-                    <label class="form-check-label fw-bold" for="isActive">Kích hoạt hiển thị</label>
-                  </div>
-                </div>
-              </div>
-
-              <div class="d-flex justify-content-end gap-2 mt-4">
-                <a th:href="@{/admin/faqs}" class="btn btn-secondary">Hủy bỏ</a>
-                <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i> Lưu dữ liệu</button>
-              </div>
-            </form>
+    <main class="main-content">
+      <div class="content-header mb-4">
+        <div class="d-flex align-items-center gap-3">
+          <a th:href="@{/admin/faqs}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+            <i class="fas fa-arrow-left text-muted"></i>
+          </a>
+          <div>
+            <h1 class="page-title mb-0" th:text="${faq.id == null ? 'Thêm câu hỏi mới' : 'Cập nhật câu hỏi'}">Title</h1>
+            <p class="page-subtitle mb-0 text-muted">Quản lý nội dung hỏi đáp</p>
           </div>
         </div>
       </div>
-    </div>
-  </main>
+
+      <form th:action="@{/admin/faqs/save}" th:object="${faq}" method="POST" class="needs-validation" novalidate>
+        <input type="hidden" th:field="*{id}">
+
+        <div class="row g-4">
+          <div class="col-lg-8">
+            <div class="card h-100 border-0 shadow-sm">
+              <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-pen me-2"></i>Nội dung</h6>
+              </div>
+              <div class="card-body p-4">
+                <div class="mb-4">
+                  <label for="question" class="form-label fw-bold">Câu hỏi <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" id="question" th:field="*{question}" required
+                         placeholder="Ví dụ: Làm thế nào để đăng ký tài khoản?">
+                  <div class="invalid-feedback">Vui lòng nhập nội dung câu hỏi.</div>
+                </div>
+
+                <div class="mb-0">
+                  <label for="answer" class="form-label fw-bold">Câu trả lời <span class="text-danger">*</span></label>
+                  <textarea class="form-control" id="answer" th:field="*{answer}" rows="8" required
+                            placeholder="Nhập câu trả lời chi tiết tại đây..."></textarea>
+                  <div class="form-text mt-2"><i class="fas fa-info-circle me-1"></i> Có thể sử dụng thẻ HTML cơ bản (b, i, ul, li) để định dạng.</div>
+                  <div class="invalid-feedback">Vui lòng nhập câu trả lời.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-4">
+            <div class="card border-0 shadow-sm">
+              <div class="card-header bg-white py-3">
+                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-cog me-2"></i>Thiết lập</h6>
+              </div>
+              <div class="card-body p-4">
+                <div class="mb-4">
+                  <label for="orderIndex" class="form-label fw-bold small text-uppercase text-muted">Thứ tự hiển thị</label>
+                  <input type="number" class="form-control" id="orderIndex" th:field="*{orderIndex}" min="0">
+                  <div class="form-text">Số nhỏ sẽ hiển thị trước (VD: 1, 2, 3...)</div>
+                </div>
+
+                <div class="mb-4">
+                  <label class="form-label fw-bold small text-uppercase text-muted mb-2">Trạng thái</label>
+                  <div class="form-check form-switch p-0 m-0 d-flex align-items-center bg-light rounded p-3 border">
+                    <label class="form-check-label flex-grow-1 cursor-pointer" for="isActive">Kích hoạt hiển thị</label>
+                    <input class="form-check-input ms-0" type="checkbox" id="isActive" th:field="*{isActive}" style="width: 3em; height: 1.5em; margin-left: 10px !important;">
+                  </div>
+                </div>
+
+                <hr class="border-light my-4">
+
+                <div class="d-grid gap-2">
+                  <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">
+                    <i class="fas fa-save me-2"></i> Lưu lại
+                  </button>
+                  <a th:href="@{/admin/faqs}" class="btn btn-light border">Hủy bỏ</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </main>
+  </div>
 </div>
 
-<div th:replace="~{layouts/dashboard/scripts :: scripts}"></div>
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script>
+  // Enable Bootstrap Validation
+  (function () {
+      'use strict'
+      var forms = document.querySelectorAll('.needs-validation')
+      Array.prototype.slice.call(forms).forEach(function (form) {
+          form.addEventListener('submit', function (event) {
+              if (!form.checkValidity()) {
+                  event.preventDefault()
+                  event.stopPropagation()
+              }
+              form.classList.add('was-validated')
+          }, false)
+      })
+  })()
+</script>
 </body>
 </html>

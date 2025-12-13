@@ -12,19 +12,30 @@ public class SlugUtils {
         if (input == null)
             throw new IllegalArgumentException("Input string cannot be null");
 
-        // Bỏ dấu tiếng Việt (Ninh Bình -> Ninh Binh)
-        String nowhitespace = WHITESPACE.matcher(input).replaceAll("-");
-        String normalized = Normalizer.normalize(nowhitespace, Normalizer.Form.NFD);
-        String slug = Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("");
+        // 1. Chuyển đổi thủ công Tiếng Việt có dấu sang không dấu (Cách an toàn nhất)
+        String slug = input.trim().toLowerCase();
+        slug = slug.replaceAll("[áàảãạăắằẳẵặâấầẩẫậ]", "a");
+        slug = slug.replaceAll("[éèẻẽẹêếềểễệ]", "e");
+        slug = slug.replaceAll("[iíìỉĩị]", "i");
+        slug = slug.replaceAll("[óòỏõọôốồổỗộơớờởỡợ]", "o");
+        slug = slug.replaceAll("[úùủũụưứừửữự]", "u");
+        slug = slug.replaceAll("[ýỳỷỹỵ]", "y");
+        slug = slug.replaceAll("đ", "d");
 
-        // Chuyển thành chữ thường và bỏ ký tự lạ
-        slug = slug.toLowerCase();
+        // 2. Thay khoảng trắng thành gạch ngang
+        slug = WHITESPACE.matcher(slug).replaceAll("-");
+
+        // 3. Chuẩn hóa Normalizer (để xử lý các dấu còn sót lại)
+        String normalized = Normalizer.normalize(slug, Normalizer.Form.NFD);
+        slug = Pattern.compile("\\p{InCombiningDiacriticalMarks}+").matcher(normalized).replaceAll("");
+
+        // 4. Loại bỏ ký tự đặc biệt
         slug = NONLATIN.matcher(slug).replaceAll("");
 
-        // Loại bỏ nhiều dấu gạch ngang liên tiếp (giao--duc -> giao-duc)
+        // 5. Xử lý gạch ngang thừa
         slug = slug.replaceAll("-+", "-");
 
-        // Xóa gạch ngang ở đầu và cuối
+        // Xóa gạch ngang đầu cuối
         if (slug.startsWith("-")) slug = slug.substring(1);
         if (slug.endsWith("-")) slug = slug.substring(0, slug.length() - 1);
 

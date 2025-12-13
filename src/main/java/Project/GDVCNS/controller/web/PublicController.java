@@ -38,7 +38,6 @@ public class PublicController {
     private final ContactService contactService;
     private final FaqRepository faqRepository;
 
-    // Repositories & Mapper
     private final CourseRepository courseRepository;
     private final PostRepository postRepository;
     private final CategoryRepository categoryRepository;
@@ -68,12 +67,11 @@ public class PublicController {
     public String coursesPage(Model model,
                               @RequestParam(defaultValue = "0") int page,
                               @RequestParam(defaultValue = "9") int size,
-                              @RequestParam(required = false) String keyword) { // [MỚI] Thêm param keyword
+                              @RequestParam(required = false) String keyword) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Course> coursePage;
 
-        // [LOGIC TÌM KIẾM]
         if (keyword != null && !keyword.trim().isEmpty()) {
             coursePage = courseRepository.findByNameContainingIgnoreCaseAndIsActiveTrue(keyword.trim(), pageable);
         } else {
@@ -81,7 +79,7 @@ public class PublicController {
         }
 
         model.addAttribute("courseList", coursePage);
-        model.addAttribute("keyword", keyword); // Trả lại keyword để view hiển thị trong ô input
+        model.addAttribute("keyword", keyword);
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", coursePage.getTotalPages());
         model.addAttribute("pageTitle", "Khóa học & Dịch vụ");
@@ -111,7 +109,12 @@ public class PublicController {
     public String courseDetail(@PathVariable String slug, Model model) {
         Course course = courseRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Khóa học không tồn tại"));
-        course.setViewCount(course.getViewCount() + 1);
+
+        // --- FIX LỖI VIEW COUNT NULL ---
+        Long currentView = course.getViewCount() == null ? 0L : course.getViewCount();
+        course.setViewCount(currentView + 1);
+        // -------------------------------
+
         courseRepository.save(course);
         model.addAttribute("service", course);
         return "public/courses/detail";
@@ -124,31 +127,24 @@ public class PublicController {
     public String newsPage(Model model,
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "10") int size,
-                           @RequestParam(required = false) String keyword) { // [MỚI] Thêm param keyword
+                           @RequestParam(required = false) String keyword) {
 
         Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
         Page<PostDTO> postPage;
 
-        // [LOGIC TÌM KIẾM]
         if (keyword != null && !keyword.trim().isEmpty()) {
-            // Tìm kiếm tất cả bài viết Published theo từ khóa
             Page<Post> posts = postRepository.searchPublishedPosts(keyword.trim(), pageable);
-            // Convert Entity sang DTO
             postPage = posts.map(postMapper::toDTO);
         } else {
-            // Mặc định lấy danh mục tin tức
             postPage = postService.getPostsByCategorySlug("tin-tuc-su-kien", page, size);
         }
 
         model.addAttribute("newsList", postPage);
-        model.addAttribute("keyword", keyword); // Trả lại keyword
-
+        model.addAttribute("keyword", keyword);
         model.addAttribute("recentNews", postService.getLatestPosts(5).getContent());
         model.addAttribute("pageTitle", "Tin tức & Sự kiện");
         return "public/news/list";
     }
-
-    // ... (Các phần code dưới giữ nguyên: postsByCategory, newsDetail, Projects, Contact...)
 
     @GetMapping("/tin-tuc/danh-muc/{slug}")
     public String postsByCategory(@PathVariable String slug,
@@ -176,17 +172,19 @@ public class PublicController {
     public String newsDetail(@PathVariable String slug, Model model) {
         Post post = postRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
-        post.setViewCount(post.getViewCount() + 1);
+
+        // --- FIX LỖI VIEW COUNT NULL ---
+        Long currentView = post.getViewCount() == null ? 0L : post.getViewCount();
+        post.setViewCount(currentView + 1);
+        // -------------------------------
+
         postRepository.save(post);
         model.addAttribute("news", postMapper.toDTO(post));
         model.addAttribute("relatedNews", postService.getLatestPosts(5).getContent());
         return "public/news/detail";
     }
 
-    // ... (Giữ nguyên phần Dự án và Liên hệ như file gốc của bạn) ...
-
     // ================= DỰ ÁN (PROJECTS) =================
-    // (Đoạn này thêm tìm kiếm cho Dự án luôn nếu bạn cần, logic tương tự Tin tức)
     @GetMapping("/du-an")
     public String projectsPage(Model model,
                                @RequestParam(defaultValue = "0") int page,
@@ -197,9 +195,6 @@ public class PublicController {
         Page<PostDTO> projectPage;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
-            // Tận dụng hàm search của Post, nhưng có thể sẽ ra cả tin tức.
-            // Nếu muốn chuẩn, cần viết thêm hàm searchByCategoryId trong Repo.
-            // Tạm thời dùng search chung:
             Page<Post> posts = postRepository.searchPublishedPosts(keyword.trim(), pageable);
             projectPage = posts.map(postMapper::toDTO);
         } else {
@@ -216,7 +211,12 @@ public class PublicController {
     public String projectDetail(@PathVariable String slug, Model model) {
         Post project = postRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Dự án không tồn tại"));
-        project.setViewCount(project.getViewCount() + 1);
+
+        // --- FIX LỖI VIEW COUNT NULL ---
+        Long currentView = project.getViewCount() == null ? 0L : project.getViewCount();
+        project.setViewCount(currentView + 1);
+        // -------------------------------
+
         postRepository.save(project);
         model.addAttribute("project", postMapper.toDTO(project));
         return "public/projects/detail";
@@ -240,6 +240,7 @@ public class PublicController {
         }
         return "redirect:/lien-he";
     }
+
     @GetMapping("/chinh-sach-bao-mat")
     public String privacyPolicy(Model model) {
         return "public/privacy";
@@ -253,17 +254,14 @@ public class PublicController {
     @GetMapping("/cau-hoi-thuong-gap")
     public String faqPage(Model model, @RequestParam(required = false) String keyword) {
         List<Faq> faqs;
-
         if (keyword != null && !keyword.trim().isEmpty()) {
             faqs = faqRepository.searchActiveFaqs(keyword.trim());
         } else {
             faqs = faqRepository.findByIsActiveTrueOrderByOrderIndexAsc();
         }
-
         model.addAttribute("faqList", faqs);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pageTitle", "Câu hỏi thường gặp - GDVCNS");
-
         return "public/faq";
     }
 }

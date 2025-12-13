@@ -2,6 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
+
 <script src="https://cdn.tiny.cloud/1/8kcytgvx85dtatwqk0acxy6uav5fuxh81rljreti0fy5idej/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
 
 <body class="admin-layout">
@@ -12,39 +13,51 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div class="content-header">
-                <h1 class="page-title" th:text="${post.id} ? 'Sửa bài viết' : 'Thêm bài viết mới'">Thêm bài viết mới</h1>
+            <div class="content-header mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/admin/posts}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h1 class="page-title mb-0" th:text="${post.id == null ? 'Thêm bài viết mới' : 'Cập nhật bài viết'}">Title</h1>
+                        <p class="page-subtitle mb-0 text-muted">Soạn thảo nội dung và quản lý thông tin bài đăng</p>
+                    </div>
+                </div>
             </div>
 
-            <form th:action="${post.id} ? @{/admin/posts/{id}(id=${post.id})} : @{/admin/posts}"
-                  th:object="${post}" method="POST" class="form-layout" enctype="multipart/form-data">
+            <form th:action="@{${post.id == null} ? '/admin/posts/save' : '/admin/posts/' + ${post.id} + '/update'}"
+                  th:object="${post}" method="POST" enctype="multipart/form-data" class="needs-validation" novalidate>
 
-                <div class="row">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row g-4">
                     <div class="col-lg-8">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Nội dung bài viết</h5>
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-pen-nib me-2"></i>Nội dung bài viết</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="title" th:field="*{title}"
-                                           onkeyup="generateSlug()" placeholder="Nhập tiêu đề bài viết" required>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="title" class="form-label fw-bold">Tiêu đề <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control form-control-lg" id="title" th:field="*{title}" required placeholder="Nhập tiêu đề bài viết...">
+                                    <div class="invalid-feedback">Tiêu đề không được để trống.</div>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="slug" class="form-label">Đường dẫn (Slug)</label>
-                                    <input type="text" class="form-control" id="slug" th:field="*{slug}" readonly style="background-color: #f8f9fa;">
+                                <div class="mb-3">
+                                    <label for="slug" class="form-label text-muted small text-uppercase">Slug (URL)</label>
+                                    <div class="input-group input-group-sm">
+                                        <span class="input-group-text bg-light text-muted">/tin-tuc/</span>
+                                        <input type="text" class="form-control" id="slug" th:field="*{slug}" placeholder="tu-dong-tao-tu-tieu-de">
+                                    </div>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="summary" class="form-label">Tóm tắt ngắn</label>
-                                    <textarea class="form-control" id="summary" th:field="*{summary}" rows="3"
-                                              placeholder="Mô tả ngắn gọn về bài viết"></textarea>
+                                <div class="mb-3">
+                                    <label for="summary" class="form-label fw-bold">Tóm tắt ngắn</label>
+                                    <textarea class="form-control" id="summary" th:field="*{summary}" rows="3" placeholder="Mô tả ngắn gọn về nội dung bài viết..."></textarea>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="content" class="form-label">Nội dung chi tiết <span class="text-danger">*</span></label>
+                                <div class="mb-0">
+                                    <label class="form-label fw-bold">Nội dung chi tiết</label>
                                     <textarea id="content-editor" th:field="*{content}"></textarea>
                                 </div>
                             </div>
@@ -52,70 +65,64 @@
                     </div>
 
                     <div class="col-lg-4">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Hình ảnh đại diện</h5>
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-paper-plane me-2"></i>Đăng bài</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="logo-preview mb-3">
-                                    <img th:src="*{thumbnailUrl != null ? thumbnailUrl : 'https://via.placeholder.com/300x200?text=Upload+Image'}"
-                                         alt="Thumbnail" id="thumbnailPreview" style="max-height: 200px; width: auto;">
-                                </div>
-                                <input type="file" class="form-control" id="thumbnailFile" name="thumbnailFile" accept="image/*">
-
-                                <input type="hidden" th:field="*{thumbnailUrl}">
-                                <small class="text-muted">JPG, PNG (Tối đa: 10MB)</small>
-                            </div>
-                        </div>
-
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Thông tin chung</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label for="category" class="form-label">Danh mục <span class="text-danger">*</span></label>
-                                    <select class="form-select" id="category" th:field="*{categoryId}" required>
-                                        <option value="">-- Chọn danh mục --</option>
-                                        <option th:each="cat : ${categories}"
-                                                th:value="${cat.id}"
-                                                th:text="${cat.name}">
-                                        </option>
-                                    </select>
-                                </div>
-
-                                <div class="form-group mb-0">
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="checkbox" id="isFeatured" th:field="*{isFeatured}">
-                                        <label class="form-check-label" for="isFeatured">
-                                            Bài viết nổi bật
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Trạng thái</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group mb-0">
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label class="form-label fw-bold">Trạng thái</label>
                                     <select class="form-select" th:field="*{status}">
-                                        <option value="DRAFT">Bản nháp</option>
-                                        <option value="PENDING">Gửi duyệt</option>
-                                        <option value="PUBLISHED" sec:authorize="hasRole('ADMIN')">Đăng ngay (Admin)</option>
-                                        <option value="HIDDEN" sec:authorize="hasRole('ADMIN')">Ẩn bài (Admin)</option>
+                                        <option value="DRAFT">📝 Bản nháp</option>
+                                        <option value="PENDING">⏳ Gửi duyệt</option>
+                                        <option value="PUBLISHED" sec:authorize="hasRole('ADMIN')">✅ Công khai ngay</option>
+                                        <option value="HIDDEN" sec:authorize="hasRole('ADMIN')">🔒 Ẩn bài viết</option>
                                     </select>
+                                </div>
+
+                                <div class="form-check mb-4">
+                                    <input class="form-check-input" type="checkbox" id="isFeatured" th:field="*{isFeatured}">
+                                    <label class="form-check-label" for="isFeatured">Đánh dấu là bài nổi bật</label>
+                                </div>
+
+                                <div class="d-grid gap-2">
+                                    <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">
+                                        <i class="fas fa-save me-2"></i> Lưu bài viết
+                                    </button>
+                                    <a th:href="@{/admin/posts}" class="btn btn-light border">Hủy bỏ</a>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="btn-group w-100">
-                            <button type="submit" class="btn btn-primary w-100">
-                                <i class="fas fa-save"></i> Lưu lại
-                            </button>
-                            <a th:href="@{/admin/posts}" class="btn btn-secondary w-100">Hủy</a>
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-folder me-2"></i>Phân loại</h6>
+                            </div>
+                            <div class="card-body p-4">
+                                <label class="form-label fw-bold">Danh mục <span class="text-danger">*</span></label>
+                                <select class="form-select" th:field="*{categoryId}" required>
+                                    <option value="">-- Chọn danh mục --</option>
+                                    <option th:each="cat : ${categories}"
+                                            th:value="${cat.id}"
+                                            th:text="${cat.name}"></option>
+                                </select>
+                                <div class="invalid-feedback">Vui lòng chọn danh mục.</div>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-image me-2"></i>Ảnh đại diện</h6>
+                            </div>
+                            <div class="card-body p-4 text-center">
+                                <div class="logo-preview mb-3 border rounded bg-light p-2 d-flex align-items-center justify-content-center position-relative" style="height: 180px; overflow: hidden;">
+                                    <img th:src="${post.thumbnailUrl != null ? post.thumbnailUrl : 'https://via.placeholder.com/300x200?text=Upload+Image'}"
+                                         alt="Thumbnail" id="imagePreview"
+                                         class="img-fluid" style="max-height: 100%; width: auto; object-fit: contain;">
+                                </div>
+                                <input type="file" class="form-control form-control-sm" name="thumbnailFile" accept="image/*" onchange="previewImage(this)">
+                                <div class="form-text mt-2 text-start small">Kích thước khuyên dùng: 800x600px (Max 5MB)</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -124,56 +131,119 @@
     </div>
 </div>
 
+<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
 <script>
-    // 1. Cấu hình TinyMCE (Upload ảnh kéo thả)
+    // 1. Cấu hình TinyMCE (Kèm tính năng upload ảnh - Đã fix Promise)
     tinymce.init({
         selector: '#content-editor',
         plugins: 'image link media table lists code help wordcount',
         toolbar: 'undo redo | formatselect | bold italic backcolor | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | removeformat | image media | help',
         height: 500,
-        images_upload_handler: function (blobInfo, success, failure) {
-            var xhr, formData;
-            xhr = new XMLHttpRequest();
+        images_upload_handler: (blobInfo, progress) => new Promise((resolve, reject) => {
+            const xhr = new XMLHttpRequest();
             xhr.withCredentials = false;
-            xhr.open('POST', '/api/upload/image'); // API upload
-            xhr.onload = function() {
-                var json;
-                if (xhr.status != 200) { failure('HTTP Error: ' + xhr.status); return; }
-                json = JSON.parse(xhr.responseText);
-                if (!json || typeof json.location != 'string') { failure('Invalid JSON: ' + xhr.responseText); return; }
-                success(json.location);
+            xhr.open('POST', '/api/upload/image');
+
+            xhr.upload.onprogress = (e) => {
+                progress(e.loaded / e.total * 100);
             };
-            formData = new FormData();
+
+            xhr.onload = () => {
+                if (xhr.status === 403) {
+                    reject({ message: 'HTTP Error: ' + xhr.status, remove: true });
+                    return;
+                }
+                if (xhr.status < 200 || xhr.status >= 300) {
+                    reject('HTTP Error: ' + xhr.status);
+                    return;
+                }
+                const json = JSON.parse(xhr.responseText);
+                if (!json || typeof json.location != 'string') {
+                    reject('Invalid JSON: ' + xhr.responseText);
+                    return;
+                }
+                resolve(json.location);
+            };
+
+            xhr.onerror = () => {
+                reject('Image upload failed due to a XHR Transport error. Code: ' + xhr.status);
+            };
+
+            const formData = new FormData();
             formData.append('file', blobInfo.blob(), blobInfo.filename());
             xhr.send(formData);
-        }
+        })
     });
 
-    // 2. Tạo Slug tự động
-    function generateSlug() {
-        const title = document.getElementById("title").value;
-        let slug = title.toLowerCase()
-            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-            .replace(/đ/g, "d")
-            .replace(/[^a-z0-9\s-]/g, "")
-            .trim()
-            .replace(/\s+/g, "-");
-        document.getElementById("slug").value = slug;
-    }
-
-    // 3. Preview ảnh Thumbnail
-    document.getElementById('thumbnailFile').addEventListener('change', function(event) {
-        const file = event.target.files[0];
-        if (file) {
+    // 2. Preview ảnh Thumbnail
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
             const reader = new FileReader();
             reader.onload = function(e) {
-                document.getElementById('thumbnailPreview').src = e.target.result;
+                document.getElementById('imagePreview').src = e.target.result;
             }
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // 3. SCRIPT TẠO SLUG TIẾNG VIỆT CHUẨN (Fix lỗi vit-nam)
+    function generateSlug(title) {
+        let slug = title.toLowerCase();
+        // Đổi ký tự có dấu thành không dấu
+        slug = slug.replace(/á|à|ả|ạ|ã|ă|ắ|ằ|ẳ|ẵ|ặ|â|ấ|ầ|ẩ|ẫ|ậ/gi, 'a');
+        slug = slug.replace(/é|è|ẻ|ẽ|ẹ|ê|ế|ề|ể|ễ|ệ/gi, 'e');
+        slug = slug.replace(/i|í|ì|ỉ|ĩ|ị/gi, 'i');
+        slug = slug.replace(/ó|ò|ỏ|õ|ọ|ô|ố|ồ|ổ|ỗ|ộ|ơ|ớ|ờ|ở|ỡ|ợ/gi, 'o');
+        slug = slug.replace(/ú|ù|ủ|ũ|ụ|ư|ứ|ừ|ử|ữ|ự/gi, 'u');
+        slug = slug.replace(/ý|ỳ|ỷ|ỹ|ỵ/gi, 'y');
+        slug = slug.replace(/đ/gi, 'd');
+        // Xóa ký tự đặc biệt
+        slug = slug.replace(/\`|\~|\!|\@|\#|\||\$|\%|\^|\&|\*|\(|\)|\+|\=|\,|\.|\/|\?|\>|\<|\'|\"|\:|\;|_/gi, '');
+        // Đổi khoảng trắng thành gạch ngang
+        slug = slug.replace(/ /gi, "-");
+        // Đổi nhiều gạch ngang liên tiếp
+        slug = slug.replace(/\-\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-\-/gi, '-');
+        slug = slug.replace(/\-\-/gi, '-');
+        // Xóa gạch ngang ở đầu và cuối
+        slug = '@' + slug + '@';
+        slug = slug.replace(/\@\-|\-\@|\@/gi, '');
+        return slug;
+    }
+
+    // Lắng nghe sự kiện nhập tiêu đề
+    document.addEventListener("DOMContentLoaded", () => {
+        const titleInput = document.getElementById("title");
+        const slugInput = document.getElementById("slug");
+        const idField = document.querySelector('input[name="id"]');
+
+        if (titleInput && slugInput) {
+            titleInput.addEventListener("input", function() {
+                // Chỉ tự động tạo slug khi đang tạo mới (chưa có ID) hoặc ô slug đang trống
+                if (!idField.value || slugInput.value === "") {
+                    slugInput.value = generateSlug(this.value);
+                }
+            });
         }
     });
-</script>
 
-<div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+    // Validation form
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms)
+            .forEach(function (form) {
+                form.addEventListener('submit', function (event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+    })()
+</script>
 </body>
 </html>

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
 
@@ -11,135 +11,164 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div class="content-header d-flex justify-content-between align-items-center">
+            <div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>
+
+            <div class="content-header d-flex justify-content-between align-items-center mb-4">
                 <div>
                     <h1 class="page-title">Quản lý Bài viết</h1>
-                    <p class="page-subtitle">Tin tức, Sự kiện, Thông báo</p>
+                    <p class="page-subtitle">Tin tức, sự kiện và thông báo</p>
                 </div>
-                <a th:href="@{/admin/posts/new}" class="btn btn-primary">
-                    <i class="fas fa-plus"></i> Thêm bài viết
+                <a th:href="@{/admin/posts/new}" class="btn btn-primary shadow-sm">
+                    <i class="fas fa-plus me-2"></i> Thêm bài viết
                 </a>
             </div>
 
-            <div class="card">
-                <div class="card-header">
-                    <form th:action="@{/admin/posts}" method="GET" id="searchForm">
-                        <div class="row g-3">
+            <div class="card mb-4 border-0 shadow-sm">
+                <div class="card-body py-3">
+                    <form th:action="@{/admin/posts}" method="get">
+                        <div class="row g-3 align-items-center">
                             <div class="col-md-4">
-                                <input type="text" class="form-control" name="keyword"
-                                       th:value="${keyword}" placeholder="Tìm kiếm theo tiêu đề...">
+                                <div class="position-relative">
+                                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                    <input type="text" class="form-control ps-5" name="keyword"
+                                           th:value="${keyword}" placeholder="Tìm theo tiêu đề...">
+                                </div>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select" name="categoryId" onchange="this.form.submit()">
-                                    <option value="">Tất cả danh mục</option>
+                                <select class="form-select" name="categoryId">
+                                    <option value="">-- Tất cả danh mục --</option>
                                     <option th:each="cat : ${categories}"
                                             th:value="${cat.id}"
                                             th:text="${cat.name}"
-                                            th:selected="${categoryId != null && categoryId == cat.id}">
-                                    </option>
+                                            th:selected="${categoryId == cat.id}"></option>
                                 </select>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select" name="status" onchange="this.form.submit()">
-                                    <option value="">Tất cả trạng thái</option>
+                                <select class="form-select" name="status">
+                                    <option value="">-- Tất cả trạng thái --</option>
                                     <option value="PUBLISHED" th:selected="${status != null && status.name() == 'PUBLISHED'}">Công khai</option>
-                                    <option value="DRAFT" th:selected="${status != null && status.name() == 'DRAFT'}">Nháp</option>
+                                    <option value="DRAFT" th:selected="${status != null && status.name() == 'DRAFT'}">Bản nháp</option>
                                     <option value="PENDING" th:selected="${status != null && status.name() == 'PENDING'}">Chờ duyệt</option>
-                                    <option value="HIDDEN" th:selected="${status != null && status.name() == 'HIDDEN'}">Ẩn</option>
+                                    <option value="HIDDEN" th:selected="${status != null && status.name() == 'HIDDEN'}">Đã ẩn</option>
                                 </select>
                             </div>
                             <div class="col-md-2">
-                                <a th:href="@{/admin/posts}" class="btn btn-secondary w-100"><i class="fas fa-sync"></i> Reset</a>
+                                <button class="btn btn-light w-100 border text-primary fw-bold" type="submit">
+                                    <i class="fas fa-filter me-1"></i> Lọc
+                                </button>
                             </div>
                         </div>
                     </form>
                 </div>
+            </div>
 
+            <div class="card border-0 shadow-sm">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
                         <tr>
-                            <th style="width: 60px;">Ảnh</th>
-                            <th>Tiêu đề</th>
-                            <th style="width: 150px;">Danh mục</th>
-                            <th style="width: 120px;">Tác giả</th>
-                            <th style="width: 100px;">Trạng thái</th>
-                            <th style="width: 100px;">Lượt xem</th>
-                            <th style="width: 140px;">Hành động</th>
+                            <th style="width: 80px;" class="text-center">Ảnh</th>
+                            <th style="width: 35%;">Tiêu đề</th>
+                            <th style="width: 15%;">Danh mục</th>
+                            <th style="width: 15%;">Tác giả</th>
+                            <th style="width: 10%;" class="text-center">Trạng thái</th>
+                            <th style="width: 10%;" class="text-center">Lượt xem</th>
+                            <th style="width: 15%;" class="text-end pe-4">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="post : ${posts}">
-                            <td>
-                                <img th:src="${post.thumbnailUrl != null ? post.thumbnailUrl : 'https://via.placeholder.com/50'}"
-                                     alt="Thumbnail" class="thumbnail-sm">
-                            </td>
-                            <td>
-                                <strong th:text="${post.title}">Tiêu đề</strong><br>
-                                <small class="text-muted" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}">Date</small>
-                            </td>
-                            <td>
-                                <span class="badge bg-light text-dark border" th:text="${post.categoryName}">Danh mục</span>
-                            </td>
-                            <td>
-                                <small th:text="${post.authorName}"></small>
-                            </td>
-                            <td>
-                                        <span class="badge"
-                                              th:classappend="${
-                                                post.status.name() == 'PUBLISHED' ? 'badge-status-published' :
-                                                (post.status.name() == 'PENDING' ? 'badge-status-processing' :
-                                                (post.status.name() == 'DRAFT' ? 'badge-status-draft' : 'badge-status-hidden'))
-                                              }"
-                                              th:text="${post.status}">STATUS</span>
-                            </td>
-                            <td>
-                                <i class="fas fa-eye"></i> <span th:text="${post.viewCount}">0</span>
-                            </td>
-                            <td>
-                                <div th:if="${isAdmin or post.authorId == currentUserId}" class="btn-group-sm">
-                                    <a th:href="@{/admin/posts/{id}/detail(id=${post.id})}"
-                                       class="btn btn-sm btn-info text-white"
-                                       style="margin-right: 4px;"
-                                       title="Xem chi tiết">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
-                                    <a th:href="@{/admin/posts/{id}/edit(id=${post.id})}" class="btn btn-warning" title="Sửa">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-
-                                    <a th:href="@{/admin/posts/{id}/delete(id=${post.id})}"
-                                       class="btn btn-danger"
-                                       onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.')" title="Xóa">
-                                        <i class="fas fa-trash"></i>
-                                    </a>
+                        <tr th:if="${posts.empty}">
+                            <td colspan="7" class="text-center py-5">
+                                <div class="text-muted opacity-75">
+                                    <i class="fas fa-newspaper fa-3x mb-3"></i>
+                                    <p class="mb-0">Chưa có bài viết nào.</p>
                                 </div>
-
-                                <span th:unless="${isAdmin or post.authorId == currentUserId}" class="text-muted small">
-                                            <i class="fas fa-lock"></i> Chỉ xem
-                                        </span>
                             </td>
                         </tr>
-                        <tr th:if="${#lists.isEmpty(posts)}">
-                            <td colspan="7" class="text-center py-4 text-muted">Không tìm thấy bài viết nào.</td>
+
+                        <tr th:each="post : ${posts}">
+                            <td class="text-center p-3">
+                                <div class="rounded border overflow-hidden position-relative" style="width: 60px; height: 45px;">
+                                    <img th:src="${post.thumbnailUrl != null ? post.thumbnailUrl : 'https://via.placeholder.com/60x45?text=Img'}"
+                                         class="w-100 h-100 object-fit-cover" alt="Thumbnail">
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <a th:href="@{/admin/posts/detail/{id}(id=${post.id})}" class="fw-bold text-dark text-decoration-none hover-primary" th:text="${post.title}">Tiêu đề</a>
+                                    <small class="text-muted" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}">Date</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge bg-light text-dark border fw-normal" th:text="${post.categoryName}">Category</span>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-xs bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 24px; height: 24px; font-size: 10px;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <span class="small" th:text="${post.authorName}">Admin</span>
+                                </div>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge rounded-pill"
+                                      th:classappend="${
+                                          post.status.name() == 'PUBLISHED' ? 'bg-success' :
+                                          (post.status.name() == 'PENDING' ? 'bg-warning text-dark' :
+                                          (post.status.name() == 'DRAFT' ? 'bg-secondary' : 'bg-danger'))
+                                      }"
+                                      th:text="${post.status.name() == 'PUBLISHED' ? 'Công khai' :
+                                                (post.status.name() == 'PENDING' ? 'Chờ duyệt' :
+                                                (post.status.name() == 'DRAFT' ? 'Nháp' : 'Ẩn'))}">Status</span>
+                            </td>
+                            <td class="text-center">
+                                <small class="text-muted"><i class="far fa-eye me-1"></i><span th:text="${post.viewCount}">0</span></small>
+                            </td>
+                            <td class="text-end pe-4">
+                                <div class="btn-group">
+                                    <a th:href="@{/admin/posts/detail/{id}(id=${post.id})}"
+                                       class="btn btn-sm btn-light text-info" title="Xem">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a th:href="@{/admin/posts/edit/{id}(id=${post.id})}"
+                                       class="btn btn-sm btn-light text-primary" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-light text-danger"
+                                            th:data-id="${post.id}"
+                                            th:data-name="${post.title}"
+                                            onclick="openDeleteModal(this)"
+                                            title="Xóa">
+                                        <i class="fas fa-trash-alt"></i>
+                                    </button>
+                                </div>
+                            </td>
                         </tr>
                         </tbody>
                     </table>
                 </div>
 
-                <div class="card-footer" th:if="${totalPages > 1}">
+                <div class="card-footer bg-white border-top-0 py-3" th:if="${totalPages > 1}">
                     <nav aria-label="Page navigation">
                         <ul class="pagination justify-content-center mb-0">
                             <li class="page-item" th:classappend="${currentPageNum == 0} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/posts(page=${currentPageNum - 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}">Trước</a>
+                                <a class="page-link rounded-pill px-3 mx-1"
+                                   th:href="@{/admin/posts(page=${currentPageNum - 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
                             </li>
                             <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
                                 th:classappend="${i == currentPageNum} ? 'active'">
-                                <a class="page-link" th:href="@{/admin/posts(page=${i}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}" th:text="${i + 1}">1</a>
+                                <a class="page-link rounded-circle mx-1 d-flex align-items-center justify-content-center"
+                                   style="width: 36px; height: 36px;"
+                                   th:href="@{/admin/posts(page=${i}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}"
+                                   th:text="${i + 1}">1</a>
                             </li>
                             <li class="page-item" th:classappend="${currentPageNum == totalPages - 1} ? 'disabled'">
-                                <a class="page-link" th:href="@{/admin/posts(page=${currentPageNum + 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}">Sau</a>
+                                <a class="page-link rounded-pill px-3 mx-1"
+                                   th:href="@{/admin/posts(page=${currentPageNum + 1}, keyword=${keyword}, categoryId=${categoryId}, status=${status})}">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
                             </li>
                         </ul>
                     </nav>
@@ -148,6 +177,45 @@
         </main>
     </div>
 </div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-0">Bạn có chắc chắn muốn xóa bài viết:</p>
+                <p class="fw-bold text-dark mt-2 mb-0" id="deleteItemName">Tên bài viết</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-danger delete-confirm-btn">
+                    <i class="fas fa-trash-alt me-1"></i> Xóa vĩnh viễn
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
+
+<script th:inline="javascript">
+    function openDeleteModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        document.getElementById('deleteItemName').textContent = name;
+        deleteWithModal(name, function() {
+            window.location.href = `/admin/posts/delete/${id}`;
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        /*[[${successMessage}]]*/
+        const successMsg = [[${successMessage}]];
+        if (successMsg) showToast(successMsg, 'success');
+    });
+</script>
 </body>
 </html>

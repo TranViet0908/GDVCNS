@@ -17,19 +17,20 @@ public class UploadRestController {
     @Autowired
     private FileStorageService fileStorageService;
 
-    // API này dành cho TinyMCE tự động upload khi kéo thả ảnh
     @PostMapping("/image")
     public ResponseEntity<Map<String, String>> uploadImage(@RequestParam("file") MultipartFile file) {
         try {
-            FileStorage storedFile = fileStorageService.storeFile(file);
+            // Lưu ảnh TinyMCE vào thư mục "content"
+            FileStorage storedFile = fileStorageService.storeFile(file, "content");
 
             Map<String, String> response = new HashMap<>();
-            // Trả về đường dẫn ảnh để TinyMCE hiển thị
             response.put("location", storedFile.getFilePath());
 
             return ResponseEntity.ok(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(null);
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
 }

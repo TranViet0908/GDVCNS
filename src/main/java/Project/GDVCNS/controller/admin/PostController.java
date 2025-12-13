@@ -1,6 +1,7 @@
 package Project.GDVCNS.controller.admin;
 
 import Project.GDVCNS.dto.PostDTO;
+import Project.GDVCNS.entity.Category;
 import Project.GDVCNS.entity.FileStorage;
 import Project.GDVCNS.entity.User;
 import Project.GDVCNS.enums.PostStatus;
@@ -8,6 +9,7 @@ import Project.GDVCNS.repository.CategoryRepository;
 import Project.GDVCNS.repository.UserRepository;
 import Project.GDVCNS.service.FileStorageService;
 import Project.GDVCNS.service.PostService;
+import Project.GDVCNS.utils.SlugUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.AccessDeniedException;
@@ -28,10 +30,9 @@ public class PostController {
     private final UserRepository userRepository;
     private final FileStorageService fileStorageService;
 
-    // 1. Hiển thị danh sách
+    // 1. Hiển thị danh sách (Giữ nguyên)
     @GetMapping
     public String listPosts(Model model,
-                            // --- KHAI BÁO ĐẦY ĐỦ THAM SỐ ĐỂ TRÁNH LỖI ĐỎ TRONG IDE ---
                             @RequestParam(required = false) String keyword,
                             @RequestParam(required = false) Long categoryId,
                             @RequestParam(required = false) PostStatus status,
@@ -40,32 +41,24 @@ public class PostController {
 
         Page<PostDTO> postPage = postService.searchPosts(keyword, categoryId, status, type, page, 10);
 
-        // --- LOGIC PHÂN QUYỀN CHUẨN ---
         Long currentUserId = null;
         boolean isAdmin = false;
-
         String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
         User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
-        if (currentUser == null) {
-            currentUser = userRepository.findByEmail(currentUsername).orElse(null);
-        }
+        if (currentUser == null) currentUser = userRepository.findByEmail(currentUsername).orElse(null);
 
         if (currentUser != null) {
             currentUserId = currentUser.getId();
             isAdmin = currentUser.getRole().name().equals("ADMIN");
         }
 
-        // Luôn luôn add attribute, kể cả khi null
         model.addAttribute("currentUserId", currentUserId);
         model.addAttribute("isAdmin", isAdmin);
-        // -------------------------------
-
         model.addAttribute("posts", postPage.getContent());
         model.addAttribute("currentPage", "posts");
         model.addAttribute("totalPages", postPage.getTotalPages());
         model.addAttribute("totalItems", postPage.getTotalElements());
         model.addAttribute("currentPageNum", page);
-
         model.addAttribute("keyword", keyword);
         model.addAttribute("categoryId", categoryId);
         model.addAttribute("status", status);
@@ -75,7 +68,7 @@ public class PostController {
         return "admin/posts/index";
     }
 
-    // 2. Form thêm mới
+    // 2. Form thêm mới (Giữ nguyên)
     @GetMapping("/new")
     public String showCreateForm(Model model) {
         model.addAttribute("post", new PostDTO());
@@ -84,17 +77,31 @@ public class PostController {
         return "admin/posts/form";
     }
 
-    // 3. Xử lý tạo mới
-    @PostMapping
+    // 3. Xử lý tạo mới [ĐÃ NÂNG CẤP ĐƯỜNG DẪN]
+    @PostMapping("/save")
     public String createPost(@ModelAttribute PostDTO postDTO,
                              @RequestParam("thumbnailFile") MultipartFile thumbnailFile,
                              RedirectAttributes redirectAttributes) {
         try {
+            // A. Tạo Slug bài viết trước
+            if (postDTO.getSlug() == null || postDTO.getSlug().isEmpty()) {
+                postDTO.setSlug(SlugUtils.makeSlug(postDTO.getTitle()));
+            }
+
+            // B. Xử lý upload ảnh
             if (!thumbnailFile.isEmpty()) {
-                FileStorage fileStorage = fileStorageService.storeFile(thumbnailFile);
+                // Lấy slug danh mục để làm tên thư mục cha
+                String categorySlug = getCategorySlug(postDTO.getCategoryId());
+
+                // Tạo đường dẫn: posts/[category-slug]/[post-slug]
+                String subDir = "posts/" + categorySlug + "/" + postDTO.getSlug();
+
+                FileStorage fileStorage = fileStorageService.storeFile(thumbnailFile, subDir);
                 postDTO.setThumbnailUrl(fileStorage.getFilePath());
             }
+
             postService.createPost(postDTO);
+
             redirectAttributes.addFlashAttribute("message", "Tạo bài viết thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
         } catch (Exception e) {
@@ -106,8 +113,8 @@ public class PostController {
         return "redirect:/admin/posts";
     }
 
-    // 4. Form chỉnh sửa
-    @GetMapping("/{id}/edit")
+    // 4. Form chỉnh sửa (Giữ nguyên)
+    @GetMapping("/edit/{id}")
     public String showEditForm(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             PostDTO postDTO = postService.getPostById(id);
@@ -124,17 +131,29 @@ public class PostController {
         }
     }
 
-    // 5. Xử lý cập nhật
-    @PostMapping("/{id}")
+    // 5. Xử lý cập nhật [ĐÃ NÂNG CẤP ĐƯỜNG DẪN]
+    @PostMapping("/{id}/update")
     public String updatePost(@PathVariable Long id,
                              @ModelAttribute PostDTO postDTO,
                              @RequestParam("thumbnailFile") MultipartFile thumbnailFile,
                              RedirectAttributes redirectAttributes) {
         try {
+            // Đảm bảo slug bài viết tồn tại
+            if (postDTO.getSlug() == null || postDTO.getSlug().isEmpty()) {
+                postDTO.setSlug(SlugUtils.makeSlug(postDTO.getTitle()));
+            }
+
             if (!thumbnailFile.isEmpty()) {
-                FileStorage fileStorage = fileStorageService.storeFile(thumbnailFile);
+                // Lấy slug danh mục mới (nếu người dùng đổi danh mục thì ảnh sang thư mục mới)
+                String categorySlug = getCategorySlug(postDTO.getCategoryId());
+
+                // Tạo đường dẫn: posts/[category-slug]/[post-slug]
+                String subDir = "posts/" + categorySlug + "/" + postDTO.getSlug();
+
+                FileStorage fileStorage = fileStorageService.storeFile(thumbnailFile, subDir);
                 postDTO.setThumbnailUrl(fileStorage.getFilePath());
             }
+
             postService.updatePost(id, postDTO);
             redirectAttributes.addFlashAttribute("message", "Cập nhật thành công!");
             redirectAttributes.addFlashAttribute("messageType", "success");
@@ -148,8 +167,8 @@ public class PostController {
         return "redirect:/admin/posts";
     }
 
-    // 6. Xóa
-    @GetMapping("/{id}/delete")
+    // ... (Giữ nguyên delete, detail) ...
+    @GetMapping("/delete/{id}")
     public String deletePost(@PathVariable Long id, RedirectAttributes redirectAttributes) {
         try {
             postService.deletePost(id);
@@ -162,41 +181,37 @@ public class PostController {
         return "redirect:/admin/posts";
     }
 
-    // 7. Xem chi tiết bài viết (Preview) - ĐÃ FIX LỖI 500
-    @GetMapping("/{id}/detail")
+    @GetMapping("/detail/{id}")
     public String viewPostDetail(@PathVariable Long id, Model model, RedirectAttributes redirectAttributes) {
         try {
             PostDTO postDTO = postService.getPostById(id);
-
-            // --- FIX LOGIC TÌM USER & SET MẶC ĐỊNH ---
             Long currentUserId = null;
             boolean isAdmin = false;
-
             String currentUsername = SecurityContextHolder.getContext().getAuthentication().getName();
-            // Ưu tiên tìm theo Username trước
             User currentUser = userRepository.findByUsername(currentUsername).orElse(null);
-            if (currentUser == null) {
-                currentUser = userRepository.findByEmail(currentUsername).orElse(null);
-            }
-
+            if (currentUser == null) currentUser = userRepository.findByEmail(currentUsername).orElse(null);
             if (currentUser != null) {
                 currentUserId = currentUser.getId();
                 isAdmin = currentUser.getRole().name().equals("ADMIN");
             }
-
-            // Luôn thêm vào model để Thymeleaf không bị lỗi null pointer
             model.addAttribute("currentUserId", currentUserId);
             model.addAttribute("isAdmin", isAdmin);
-            // -----------------------------------------
-
             model.addAttribute("post", postDTO);
             model.addAttribute("currentPage", "posts");
             return "admin/posts/detail";
         } catch (Exception e) {
-            e.printStackTrace();
-            redirectAttributes.addFlashAttribute("message", "Không tìm thấy bài viết!");
-            redirectAttributes.addFlashAttribute("messageType", "danger");
             return "redirect:/admin/posts";
         }
+    }
+
+    // === HÀM HỖ TRỢ LẤY SLUG DANH MỤC ===
+    private String getCategorySlug(Long categoryId) {
+        if (categoryId == null) return "uncategorized"; // Mặc định nếu không chọn (hiếm khi xảy ra vì form require)
+
+        Category category = categoryRepository.findById(categoryId).orElse(null);
+        if (category != null) {
+            return category.getSlug(); // VD: tin-tuc-su-kien
+        }
+        return "uncategorized";
     }
 }

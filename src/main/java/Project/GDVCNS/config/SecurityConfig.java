@@ -9,6 +9,7 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer; // <--- NHỚ IMPORT DÒNG NÀY
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -24,49 +25,36 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Cấu hình quyền truy cập (Authorization)
+                // --- QUAN TRỌNG: PHẢI CÓ DÒNG NÀY MỚI UPLOAD ĐƯỢC ---
+                .csrf(AbstractHttpConfigurer::disable)
+                // ----------------------------------------------------
+
                 .authorizeHttpRequests(auth -> auth
-                        // A. TÀI NGUYÊN TĨNH
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/vendor/**", "/uploads/**", "/public/**").permitAll()
-
-                        // B. TRANG LOGIN ADMIN
                         .requestMatchers("/admin/login", "/admin/perform_login").permitAll()
-
-                        // C. CÁC TRANG PUBLIC (Khách vãng lai xem thoải mái)
                         .requestMatchers("/", "/home", "/gioi-thieu", "/lien-he", "/error").permitAll()
-                        .requestMatchers("/chinh-sach-bao-mat", "/dieu-khoan-su-dung", "/cau-hoi-thuong-gap").permitAll() // <--- THÊM DÒNG NÀY
-
+                        .requestMatchers("/chinh-sach-bao-mat", "/dieu-khoan-su-dung", "/cau-hoi-thuong-gap").permitAll()
                         .requestMatchers("/tin-tuc/**", "/khoa-hoc/**", "/dich-vu/**", "/du-an/**").permitAll()
                         .requestMatchers("/api/**").permitAll()
-
-                        // D. KHU VỰC ADMIN
                         .requestMatchers("/admin/**").hasAnyRole("ADMIN", "EDITOR")
-
-                        // E. CÁC TRANG CÒN LẠI
                         .anyRequest().authenticated()
                 )
-
-                // 2. Cấu hình Form Login
                 .formLogin(form -> form
                         .loginPage("/admin/login")
                         .loginProcessingUrl("/admin/perform_login")
-                        .defaultSuccessUrl("/admin/dashboard", true) // Login xong vào dashboard
+                        .defaultSuccessUrl("/admin/dashboard", true)
                         .failureUrl("/admin/login?error=true")
                         .usernameParameter("username")
                         .passwordParameter("password")
                         .permitAll()
                 )
-
-                // 3. Cấu hình Logout
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/") // Logout xong về trang chủ cho thân thiện (hoặc về /admin/login)
+                        .logoutSuccessUrl("/admin/dashboard")
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 )
-
-                // 4. Xử lý lỗi 403 (Không có quyền)
                 .exceptionHandling(ex -> ex
                         .accessDeniedPage("/403")
                 );

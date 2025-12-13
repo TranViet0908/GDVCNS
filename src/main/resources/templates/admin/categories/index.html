@@ -16,7 +16,7 @@
             <div class="content-header d-flex justify-content-between align-items-center">
                 <div>
                     <h1 class="page-title">Quản lý Danh mục</h1>
-                    <p class="page-subtitle">Phân loại nội dung bài viết và khóa học</p>
+                    <p class="page-subtitle">Phân loại và tổ chức nội dung hệ thống</p>
                 </div>
                 <a th:href="@{/admin/categories/new}" class="btn btn-primary">
                     <i class="fas fa-plus"></i> Thêm danh mục
@@ -24,20 +24,22 @@
             </div>
 
             <div class="card mb-4">
-                <div class="card-body">
-                    <form th:action="@{/admin/categories}" method="get" class="row g-3">
-                        <div class="col-md-6">
-                            <div class="input-group">
-                                    <span class="input-group-text bg-light border-end-0">
-                                        <i class="fas fa-search text-muted"></i>
-                                    </span>
-                                <input type="text" class="form-control border-start-0 ps-0"
-                                       name="keyword"
-                                       th:value="${keyword}"
-                                       placeholder="Tìm kiếm danh mục theo tên...">
-                                <button class="btn btn-primary" type="submit">Tìm kiếm</button>
-                                <a th:if="${keyword}" th:href="@{/admin/categories}" class="btn btn-secondary" title="Xóa tìm kiếm">
-                                    <i class="fas fa-times"></i>
+                <div class="card-body py-3">
+                    <form th:action="@{/admin/categories}" method="get">
+                        <div class="row align-items-center">
+                            <div class="col-md-5">
+                                <div class="position-relative">
+                                    <i class="fas fa-search position-absolute top-50 start-0 translate-middle-y ms-3 text-muted"></i>
+                                    <input type="text" class="form-control ps-5" name="keyword"
+                                           th:value="${keyword}" placeholder="Nhập tên danh mục cần tìm...">
+                                </div>
+                            </div>
+                            <div class="col-md-2">
+                                <button class="btn btn-light w-100 border" type="submit">Tìm kiếm</button>
+                            </div>
+                            <div class="col-md-2" th:if="${keyword}">
+                                <a th:href="@{/admin/categories}" class="btn btn-link text-danger text-decoration-none">
+                                    <i class="fas fa-times me-1"></i> Xóa lọc
                                 </a>
                             </div>
                         </div>
@@ -47,59 +49,58 @@
 
             <div class="card">
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0 align-middle">
+                    <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                         <tr>
-                            <th style="width: 30%;">Tên danh mục</th>
+                            <th style="width: 35%;">Tên danh mục</th>
                             <th style="width: 25%;">Danh mục cha</th>
-                            <th style="width: 25%;">Slug</th>
-                            <th style="width: 10%;">Loại</th>
-                            <th style="width: 10%;" class="text-end">Hành động</th>
+                            <th style="width: 20%;">Loại nội dung</th>
+                            <th style="width: 20%;" class="text-end">Hành động</th>
                         </tr>
                         </thead>
                         <tbody>
                         <tr th:if="${categories.empty}">
-                            <td colspan="5" class="text-center py-5">
-                                <div class="text-muted">
-                                    <i class="fas fa-folder-open fa-3x mb-3 opacity-50"></i>
-                                    <p>Không tìm thấy dữ liệu nào.</p>
+                            <td colspan="4" class="text-center py-5">
+                                <div class="text-muted opacity-75">
+                                    <i class="fas fa-folder-open fa-3x mb-3"></i>
+                                    <p class="mb-0">Chưa có danh mục nào được tạo.</p>
                                 </div>
                             </td>
                         </tr>
 
                         <tr th:each="cat : ${categories}">
                             <td>
-                                <div class="fw-bold text-dark" th:text="${cat.name}">Tên danh mục</div>
+                                <div class="d-flex flex-column">
+                                    <span class="fw-bold text-primary" th:text="${cat.name}">Tên danh mục</span>
+                                    <small class="text-muted font-monospace" th:text="${cat.slug}">slug-name</small>
+                                </div>
                             </td>
                             <td>
-                                        <span th:if="${cat.parentName}" class="badge bg-light text-dark border">
-                                            <i class="fas fa-level-up-alt me-1 text-muted"></i>
-                                            <span th:text="${cat.parentName}"></span>
-                                        </span>
-                                <span th:unless="${cat.parentName}" class="text-muted fst-italic small">- Gốc -</span>
+                                <div th:if="${cat.parentName}" class="d-flex align-items-center text-dark">
+                                    <i class="fas fa-level-up-alt text-muted me-2 fa-flip-horizontal"></i>
+                                    <span th:text="${cat.parentName}">Cha</span>
+                                </div>
+                                <span th:unless="${cat.parentName}" class="badge bg-secondary opacity-50">Gốc</span>
                             </td>
                             <td>
-                                <code class="text-primary small" th:text="${cat.slug}">slug-name</code>
-                            </td>
-                            <td>
-                                        <span class="badge"
-                                              th:classappend="${cat.type.name() == 'POST' ? 'bg-info' : 'bg-warning'}"
-                                              th:text="${cat.type.name() == 'POST' ? 'Bài viết' : 'Khóa học'}">
-                                        </span>
+                                <span class="badge"
+                                      th:classappend="${cat.type.name() == 'POST' ? 'bg-info' : 'bg-warning'}"
+                                      th:text="${cat.type.name() == 'POST' ? 'Bài viết' : 'Khóa học'}">
+                                    Type
+                                </span>
                             </td>
                             <td class="text-end">
-                                <div class="btn-group">
-                                    <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}"
-                                       class="btn btn-sm btn-outline-primary" title="Sửa">
-                                        <i class="fas fa-edit"></i>
-                                    </a>
-                                    <a th:href="@{/admin/categories/{id}/delete(id=${cat.id})}"
-                                       class="btn btn-sm btn-outline-danger"
-                                       onclick="return confirm('Cảnh báo: Xóa danh mục cha sẽ xóa tất cả danh mục con!\nBạn có chắc chắn muốn xóa?')"
-                                       title="Xóa">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </a>
-                                </div>
+                                <a th:href="@{/admin/categories/{id}/edit(id=${cat.id})}"
+                                   class="btn btn-sm btn-light text-primary me-1" title="Chỉnh sửa">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-light text-danger"
+                                        th:data-id="${cat.id}"
+                                        th:data-name="${cat.name}"
+                                        onclick="openDeleteModal(this)"
+                                        title="Xóa">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
                             </td>
                         </tr>
                         </tbody>
@@ -110,16 +111,59 @@
     </div>
 </div>
 
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-0">Bạn có chắc chắn muốn xóa danh mục này?</p>
+                <p class="fw-bold text-dark mt-2 mb-0" id="deleteItemName">Tên mục</p>
+                <div class="alert alert-warning mt-3 mb-0 d-flex align-items-center">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    <small>Lưu ý: Nếu đây là danh mục cha, các danh mục con cũng sẽ bị ảnh hưởng.</small>
+                </div>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-danger delete-confirm-btn">
+                    <i class="fas fa-trash-alt me-1"></i> Xóa ngay
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
 
-<script th:if="${successMessage}">
+<script th:inline="javascript">
+    // Hàm xử lý mở Modal Xóa
+    function openDeleteModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+
+        // Cập nhật tên trong modal để người dùng biết đang xóa cái gì
+        document.getElementById('deleteItemName').textContent = `"${name}"`;
+
+        // Gọi hàm deleteWithModal từ admin.js
+        // Tham số 1: Tên hiển thị (không dùng ở đây vì ta đã set ở trên)
+        // Tham số 2: Callback function khi người dùng bấm nút "Xóa ngay"
+        deleteWithModal(name, function() {
+            window.location.href = `/admin/categories/${id}/delete`;
+        });
+    }
+
+    // Hiển thị Toast thông báo (giữ nguyên logic cũ)
     document.addEventListener('DOMContentLoaded', () => {
-        showToast("[[${successMessage}]]", 'success');
-    });
-</script>
-<script th:if="${errorMessage}">
-    document.addEventListener('DOMContentLoaded', () => {
-        showToast("[[${errorMessage}]]", 'error');
+        /*[[${successMessage}]]*/
+        const successMsg = [[${successMessage}]];
+        /*[[${errorMessage}]]*/
+        const errorMsg = [[${errorMessage}]];
+
+        if (successMsg) showToast(successMsg, 'success');
+        if (errorMsg) showToast(errorMsg, 'error');
     });
 </script>
 </body>

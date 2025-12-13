@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html xmlns:th="http://www.thymeleaf.org">
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
 
@@ -11,40 +11,54 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div class="content-header">
-                <h1 class="page-title" th:text="${pageTitle}">Thêm/Sửa Khóa học</h1>
+            <div class="content-header mb-4">
+                <div class="d-flex align-items-center gap-3">
+                    <a th:href="@{/admin/courses}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                        <i class="fas fa-arrow-left text-muted"></i>
+                    </a>
+                    <div>
+                        <h1 class="page-title mb-0" th:text="${course.id == null ? 'Thêm khóa học mới' : 'Cập nhật khóa học'}">Title</h1>
+                        <p class="page-subtitle mb-0 text-muted">Điền đầy đủ thông tin về chương trình đào tạo</p>
+                    </div>
+                </div>
             </div>
 
             <form th:action="@{/admin/courses/save}" th:object="${course}" method="POST"
-                  enctype="multipart/form-data" class="form-layout" novalidate>
+                  enctype="multipart/form-data" class="needs-validation" novalidate>
 
                 <input type="hidden" th:field="*{id}">
 
-                <div class="row">
+                <div class="row g-4">
                     <div class="col-lg-8">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Thông tin chung</h5>
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-info-circle me-2"></i>Nội dung khóa học</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label for="name" class="form-label">Tên khóa học <span class="text-danger">*</span></label>
-                                    <input type="text" class="form-control" id="name" th:field="*{name}" required>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="name" class="form-label fw-bold">Tên khóa học <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="name" th:field="*{name}" required
+                                           placeholder="Ví dụ: Khóa học AI cho người mới bắt đầu">
+                                    <div class="invalid-feedback">Vui lòng nhập tên khóa học.</div>
                                 </div>
 
-                                <div class="form-group mb-3">
+                                <div class="mb-3">
                                     <label for="slug" class="form-label">Đường dẫn (Slug)</label>
-                                    <input type="text" class="form-control" id="slug" th:field="*{slug}" placeholder="tu-dong-tao-tu-ten">
-                                    <small class="text-muted">Để trống sẽ tự động tạo từ tên khóa học.</small>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light text-muted">/khoa-hoc/</span>
+                                        <input type="text" class="form-control" id="slug" th:field="*{slug}" placeholder="tu-dong-tao-tu-ten">
+                                    </div>
+                                    <div class="form-text text-muted small mt-1">Để trống để tự động tạo từ tên khóa học.</div>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="summary" class="form-label">Mô tả ngắn (Summary)</label>
-                                    <textarea class="form-control" id="summary" th:field="*{summary}" rows="3"></textarea>
+                                <div class="mb-3">
+                                    <label for="summary" class="form-label fw-bold">Mô tả ngắn</label>
+                                    <textarea class="form-control" id="summary" th:field="*{summary}" rows="3"
+                                              placeholder="Giới thiệu tóm tắt về khóa học (hiển thị ở thẻ card)..."></textarea>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="content" class="form-label">Nội dung chi tiết</label>
+                                <div class="mb-0">
+                                    <label for="content" class="form-label fw-bold">Nội dung chi tiết</label>
                                     <textarea class="form-control editor" id="content" th:field="*{content}"></textarea>
                                 </div>
                             </div>
@@ -52,71 +66,72 @@
                     </div>
 
                     <div class="col-lg-4">
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Xuất bản</h5>
-                            </div>
-                            <div class="card-body">
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-body p-4">
                                 <div class="form-check form-switch mb-3">
                                     <input class="form-check-input" type="checkbox" id="isActive" th:field="*{isActive}">
-                                    <label class="form-check-label" for="isActive">Kích hoạt (Hiển thị)</label>
+                                    <label class="form-check-label fw-bold" for="isActive">Kích hoạt (Hiển thị ngay)</label>
                                 </div>
                                 <div class="d-grid gap-2">
-                                    <button type="submit" class="btn btn-primary">
-                                        <i class="fas fa-save"></i> Lưu lại
+                                    <button type="submit" class="btn btn-primary fw-bold py-2 shadow-sm">
+                                        <i class="fas fa-save me-2"></i> Lưu khóa học
                                     </button>
-                                    <a th:href="@{/admin/courses}" class="btn btn-secondary">Quay lại</a>
+                                    <a th:href="@{/admin/courses}" class="btn btn-light border">Hủy bỏ</a>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Thuộc tính khóa học</h5>
+                        <div class="card border-0 shadow-sm mb-4">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-sliders-h me-2"></i>Thuộc tính</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label for="categoryId" class="form-label">Danh mục</label>
+                            <div class="card-body p-4">
+                                <div class="mb-3">
+                                    <label for="categoryId" class="form-label fw-bold small text-uppercase text-muted">Danh mục</label>
                                     <select class="form-select" id="categoryId" th:field="*{categoryId}">
-                                        <option value="" selected>-- Chọn danh mục --</option>
+                                        <option value="">-- Chọn danh mục --</option>
                                         <option th:each="cat : ${categories}"
                                                 th:value="${cat.id}"
-                                                th:text="${cat.name}">Category Name</option>
+                                                th:text="${cat.name}">Category</option>
                                     </select>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="duration" class="form-label">Thời lượng</label>
-                                    <input type="text" class="form-control" id="duration" th:field="*{duration}" placeholder="VD: 05 buổi, 3 tháng...">
+                                <div class="mb-3">
+                                    <label for="duration" class="form-label fw-bold small text-uppercase text-muted">Thời lượng</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light"><i class="far fa-clock"></i></span>
+                                        <input type="text" class="form-control" id="duration" th:field="*{duration}" placeholder="VD: 05 buổi">
+                                    </div>
                                 </div>
 
-                                <div class="form-group mb-3">
-                                    <label for="targetAudience" class="form-label">Đối tượng tham gia</label>
-                                    <input type="text" class="form-control" id="targetAudience" th:field="*{targetAudience}" placeholder="VD: Cán bộ, Sinh viên...">
-                                </div>
-
-                                <div class="form-group mb-3">
-                                    <label for="trainingFormat" class="form-label">Hình thức đào tạo</label>
+                                <div class="mb-3">
+                                    <label for="trainingFormat" class="form-label fw-bold small text-uppercase text-muted">Hình thức</label>
                                     <select class="form-select" id="trainingFormat" th:field="*{trainingFormat}">
                                         <option value="Offline">Trực tiếp (Offline)</option>
                                         <option value="Online">Trực tuyến (Online)</option>
                                         <option value="Hybrid">Kết hợp (Hybrid)</option>
                                     </select>
                                 </div>
+
+                                <div class="mb-0">
+                                    <label for="targetAudience" class="form-label fw-bold small text-uppercase text-muted">Đối tượng</label>
+                                    <input type="text" class="form-control" id="targetAudience" th:field="*{targetAudience}" placeholder="VD: Sinh viên, Cán bộ...">
+                                </div>
                             </div>
                         </div>
 
-                        <div class="card mb-3">
-                            <div class="card-header">
-                                <h5 class="card-title">Ảnh đại diện (Thumbnail)</h5>
+                        <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white py-3">
+                                <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-image me-2"></i>Ảnh đại diện</h6>
                             </div>
-                            <div class="card-body">
-                                <div class="logo-preview mb-3">
+                            <div class="card-body p-4 text-center">
+                                <div class="logo-preview mb-3 border rounded bg-light p-2 d-flex align-items-center justify-content-center" style="height: 180px; overflow: hidden;">
                                     <img th:src="${course.thumbnailUrl != null ? course.thumbnailUrl : 'https://via.placeholder.com/300x200?text=No+Image'}"
-                                         alt="Thumbnail Preview" id="imagePreview"
-                                         style="max-height: 200px; width: auto; object-fit: cover;">
+                                         alt="Thumbnail" id="imagePreview"
+                                         class="img-fluid" style="max-height: 100%; width: auto; object-fit: contain;">
                                 </div>
-                                <input type="file" class="form-control" id="image" name="image" accept="image/*">
+                                <input type="file" class="form-control form-control-sm" id="image" name="image" accept="image/*" onchange="previewImage(this)">
+                                <div class="form-text mt-2 text-start small">Hỗ trợ: JPG, PNG (Max 5MB)</div>
                             </div>
                         </div>
                     </div>
@@ -131,30 +146,39 @@
 <script src="https://cdn.ckeditor.com/ckeditor5/41.0.0/classic/ckeditor.js"></script>
 <script>
     // Init CKEditor
-    ClassicEditor.create(document.querySelector('.editor'))
-        .catch(error => console.error(error));
+    ClassicEditor.create(document.querySelector('.editor'), {
+        toolbar: ['heading', '|', 'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|', 'undo', 'redo']
+    }).catch(error => console.error(error));
 
-    // Auto generate slug from name
+    // Preview Image
+    function previewImage(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('imagePreview').src = e.target.result;
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    // Auto Slug & Validation
     document.addEventListener("DOMContentLoaded", () => {
-        // Hàm autoGenerateSlug đã có trong admin.js, chỉ cần gọi
-        if (typeof autoGenerateSlug === "function") {
-            autoGenerateSlug('name', 'slug');
+        if (typeof window.autoGenerateSlug === 'function') {
+            window.autoGenerateSlug('name', 'slug');
         }
 
-        // Init Image Preview (custom for this form if needed, or rely on admin.js)
-        const imageInput = document.getElementById('image');
-        if(imageInput){
-            imageInput.addEventListener('change', function(){
-                const preview = document.getElementById('imagePreview');
-                if (this.files && this.files[0]) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => preview.src = e.target.result;
-                    reader.readAsDataURL(this.files[0]);
+        // Bootstrap Validation
+        const forms = document.querySelectorAll('.needs-validation');
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
                 }
-            });
-        }
+                form.classList.add('was-validated');
+            }, false);
+        });
     });
 </script>
-
 </body>
 </html>

@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -29,4 +30,8 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     boolean existsBySlug(String slug);
     long countByCategoryId(Long categoryId);
     List<Post> findTop3ByStatusOrderByPublishedAtDesc(PostStatus status);
+
+    // [MỚI] Thống kê bài viết mới theo tháng
+    @Query("SELECT MONTH(p.createdAt), COUNT(p) FROM Post p WHERE YEAR(p.createdAt) = :year GROUP BY MONTH(p.createdAt)")
+    List<Object[]> countPostsByMonth(@Param("year") int year);
 }

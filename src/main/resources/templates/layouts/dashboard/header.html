@@ -1,32 +1,54 @@
 <header class="topbar" th:fragment="header" xmlns:th="http://www.w3.org/1999/xhtml">
-    <div class="topbar-left">
-        <div class="breadcrumb-wrapper" th:if="${breadcrumb}">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}">Trang chủ</a></li>
-                    <li class="breadcrumb-item active" th:text="${breadcrumb}"></li>
-                </ol>
-            </nav>
+    <div class="d-flex align-items-center">
+        <button class="toggle-btn" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <div class="search-bar">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" class="search-input" placeholder="Tìm kiếm nhanh (Ctrl+K)...">
         </div>
     </div>
 
-    <div class="topbar-right">
-        <a href="/" target="_blank" class="btn-view-site" title="Xem trang web">
-            <i class="fas fa-external-link-alt"></i>
-            <span>Xem trang web</span>
+    <div class="topbar-actions">
+        <a href="/" target="_blank" class="action-btn" title="Xem trang chủ" data-bs-toggle="tooltip">
+            <i class="fas fa-globe"></i>
         </a>
 
-        <div class="dropdown user-dropdown">
-            <button class="btn-user" type="button" data-bs-toggle="dropdown">
-                <img src="https://via.placeholder.com/32" class="avatar-sm" alt="Avatar">
-                <span class="user-name" th:text="${#authentication.name}">Admin</span>
-                <i class="fas fa-chevron-down"></i>
+        <div class="dropdown">
+            <button class="action-btn position-relative" title="Thông báo" data-bs-toggle="dropdown">
+                <i class="far fa-bell"></i>
+                <span class="notification-dot"></span>
             </button>
-            <ul class="dropdown-menu dropdown-menu-end">
-                <li><a class="dropdown-item" href="#"><i class="fas fa-user"></i> Hồ sơ cá nhân</a></li>
-                <li><a class="dropdown-item" href="#"><i class="fas fa-lock"></i> Đổi mật khẩu</a></li>
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 p-0" style="min-width: 280px;">
+                <li class="p-3 border-bottom"><h6 class="m-0 text-dark">Thông báo</h6></li>
+                <li><a class="dropdown-item p-3 text-wrap small text-muted" href="#">Không có thông báo mới</a></li>
+            </ul>
+        </div>
+
+        <div style="width: 1px; height: 24px; background: var(--color-gray); margin: 0 4px;"></div>
+
+        <div class="dropdown">
+            <div class="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="profile-info d-none d-md-flex">
+                    <span class="profile-name"
+                          th:text="${#authentication.principal.user.fullName != null ? #authentication.principal.user.fullName : #authentication.name}">
+                        Admin
+                    </span>
+                    <span class="profile-role" th:text="${#authentication.authorities[0].authority.replace('ROLE_', '')}">ADMIN</span>
+                </div>
+
+                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" class="profile-img" alt="Avatar">
+
+                <i class="fas fa-chevron-down text-muted ms-2" style="font-size: 10px;"></i>
+            </div>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2">
+                <li><h6 class="dropdown-header">Tài khoản</h6></li>
+                <li><a class="dropdown-item" href="#"><i class="fas fa-user-circle me-2 text-primary"></i> Hồ sơ cá nhân</a></li>
+                <li><a class="dropdown-item" href="#"><i class="fas fa-key me-2 text-warning"></i> Đổi mật khẩu</a></li>
                 <li><hr class="dropdown-divider"></li>
-                <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a></li>
+                <li><a class="dropdown-item text-danger" th:href="@{/logout}"><i class="fas fa-sign-out-alt me-2"></i> Đăng xuất</a></li>
             </ul>
         </div>
     </div>

@@ -11,113 +11,137 @@
         <header th:insert="~{layouts/dashboard/header :: header}"></header>
 
         <main class="main-content">
-            <div class="content-header d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <a th:href="@{/admin/posts}" class="btn btn-outline-secondary mb-2">
-                        <i class="fas fa-arrow-left"></i> Quay lại danh sách
-                    </a>
-                    <h1 class="page-title">Chi tiết bài viết</h1>
-                </div>
+            <div class="content-header mb-4">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center gap-3">
+                        <a th:href="@{/admin/posts}" class="btn btn-light border btn-sm rounded-circle" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-arrow-left text-muted"></i>
+                        </a>
+                        <div>
+                            <h1 class="page-title mb-0">Chi tiết bài viết</h1>
+                            <nav aria-label="breadcrumb">
+                                <ol class="breadcrumb mb-0 small">
+                                    <li class="breadcrumb-item"><a th:href="@{/admin/dashboard}" class="text-decoration-none">Dashboard</a></li>
+                                    <li class="breadcrumb-item"><a th:href="@{/admin/posts}" class="text-decoration-none">Bài viết</a></li>
+                                    <li class="breadcrumb-item active text-muted" th:text="${post.title}">Tiêu đề</li>
+                                </ol>
+                            </nav>
+                        </div>
+                    </div>
 
-                <div class="btn-group">
-                    <a th:if="${isAdmin or post.authorId == currentUserId}"
-                       th:href="@{/admin/posts/{id}/edit(id=${post.id})}"
-                       class="btn btn-warning">
-                        <i class="fas fa-edit"></i> Chỉnh sửa
-                    </a>
-
-                    <a th:if="${isAdmin or post.authorId == currentUserId}"
-                       th:href="@{/admin/posts/{id}/delete(id=${post.id})}"
-                       class="btn btn-danger"
-                       onclick="return confirm('Bạn có chắc chắn muốn xóa bài viết này?')">
-                        <i class="fas fa-trash"></i> Xóa
-                    </a>
+                    <div class="btn-group">
+                        <a th:href="@{/admin/posts/edit/{id}(id=${post.id})}" class="btn btn-warning shadow-sm">
+                            <i class="fas fa-edit me-2"></i> Chỉnh sửa
+                        </a>
+                        <button type="button" class="btn btn-danger shadow-sm"
+                                th:data-id="${post.id}"
+                                th:data-name="${post.title}"
+                                onclick="openDeleteModal(this)">
+                            <i class="fas fa-trash me-2"></i> Xóa
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div class="card mb-4">
-                <div class="card-body">
-                    <div class="row text-center">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div class="row text-center g-3">
                         <div class="col-md-3 border-end">
-                            <small class="text-muted d-block">Trạng thái</small>
-                            <span class="badge mt-1"
-                                  th:classappend="${
-                                        post.status.name() == 'PUBLISHED' ? 'bg-success' :
-                                        (post.status.name() == 'PENDING' ? 'bg-warning text-dark' : 'bg-secondary')
-                                      }"
-                                  th:text="${post.status}">PUBLISHED</span>
+                            <span class="d-block text-muted text-uppercase small mb-1">Trạng thái</span>
+                            <span class="badge rounded-pill"
+                                  th:classappend="${post.status.name() == 'PUBLISHED' ? 'bg-success' : 'bg-secondary'}"
+                                  th:text="${post.status}">STATUS</span>
                         </div>
                         <div class="col-md-3 border-end">
-                            <small class="text-muted d-block">Tác giả</small>
-                            <strong th:text="${post.authorName}">Admin</strong>
+                            <span class="d-block text-muted text-uppercase small mb-1">Tác giả</span>
+                            <span class="fw-bold text-dark" th:text="${post.authorName}">Admin</span>
                         </div>
                         <div class="col-md-3 border-end">
-                            <small class="text-muted d-block">Danh mục</small>
-                            <strong th:text="${post.categoryName}">Tin tức</strong>
+                            <span class="d-block text-muted text-uppercase small mb-1">Danh mục</span>
+                            <span class="fw-bold text-primary" th:text="${post.categoryName}">News</span>
                         </div>
                         <div class="col-md-3">
-                            <small class="text-muted d-block">Ngày đăng</small>
-                            <span th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}"></span>
+                            <span class="d-block text-muted text-uppercase small mb-1">Ngày đăng</span>
+                            <span class="fw-bold text-dark" th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy HH:mm')}">--</span>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="card shadow-sm">
-                <div class="card-header bg-light">
-                    <h5 class="card-title mb-0"><i class="fas fa-desktop"></i> Xem trước hiển thị (Preview)</h5>
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0 fw-bold text-primary"><i class="fas fa-desktop me-2"></i>Xem trước bài viết</h6>
+                    <span class="badge bg-light text-dark border font-monospace small"><i class="far fa-eye me-1"></i><span th:text="${post.viewCount}">0</span> lượt xem</span>
                 </div>
                 <div class="card-body p-0">
-                    <div class="public-preview-container" style="max-width: 900px; margin: 0 auto; padding: 40px 20px;">
+                    <div class="public-preview-container mx-auto" style="max-width: 800px; padding: 40px 20px;">
 
-                        <div class="mb-4 text-center" th:if="${post.thumbnailUrl != null}">
-                            <img th:src="${post.thumbnailUrl}" alt="Thumbnail" class="img-fluid rounded" style="max-height: 400px; width: 100%; object-fit: cover;">
+                        <div class="mb-4 text-center rounded overflow-hidden" th:if="${post.thumbnailUrl != null}">
+                            <img th:src="${post.thumbnailUrl}" alt="Post Thumbnail" class="img-fluid w-100" style="max-height: 400px; object-fit: cover;">
                         </div>
 
-                        <h1 class="mb-3 fw-bold text-dark" style="font-size: 2.5rem; line-height: 1.3;" th:text="${post.title}">Tiêu đề bài viết</h1>
+                        <h1 class="fw-bold text-dark mb-3 display-6" th:text="${post.title}">Tiêu đề bài viết</h1>
 
-                        <div class="mb-4 text-muted">
-                            <span class="me-3"><i class="far fa-clock"></i> <span th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}"></span></span>
-                            <span class="me-3"><i class="far fa-user"></i> <span th:text="${post.authorName}"></span></span>
-                            <span><i class="far fa-folder"></i> <span th:text="${post.categoryName}"></span></span>
+                        <div class="d-flex align-items-center text-muted mb-4 small">
+                            <span class="me-3"><i class="far fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(post.createdAt, 'dd/MM/yyyy')}"></span></span>
+                            <span class="me-3"><i class="far fa-folder me-1"></i> <span th:text="${post.categoryName}"></span></span>
                         </div>
 
-                        <div class="mb-4 p-3 bg-light border-start border-4 border-primary fst-italic text-secondary">
+                        <div class="p-3 bg-light border-start border-4 border-primary fst-italic text-secondary mb-4 rounded-end">
                             <strong class="text-dark">Tóm tắt: </strong>
                             <span th:text="${post.summary}">Nội dung tóm tắt...</span>
                         </div>
 
-                        <hr>
+                        <hr class="my-4 text-muted opacity-25">
 
-                        <div class="post-content mt-4" th:utext="${post.content}">
+                        <div class="post-content lh-lg text-dark" th:utext="${post.content}">
                         </div>
-
                     </div>
                 </div>
             </div>
-
         </main>
+    </div>
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold text-danger">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-0">Bạn có chắc chắn muốn xóa bài viết này?</p>
+            </div>
+            <div class="modal-footer border-0 pt-0">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Hủy bỏ</button>
+                <button type="button" class="btn btn-danger delete-confirm-btn">
+                    <i class="fas fa-trash-alt me-1"></i> Xóa vĩnh viễn
+                </button>
+            </div>
+        </div>
     </div>
 </div>
 
 <div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
 
+<script th:inline="javascript">
+    function openDeleteModal(button) {
+        const id = button.getAttribute('data-id');
+        const name = button.getAttribute('data-name');
+        deleteWithModal(name, function() {
+            window.location.href = `/admin/posts/delete/${id}`;
+        });
+    }
+</script>
+
 <style>
-    /* CSS cho phần nội dung bài viết để ảnh không bị tràn */
-    .post-content img {
-        max-width: 100%;
-        height: auto !important;
-        border-radius: 4px;
-        margin: 10px 0;
-    }
-    .post-content iframe {
-        max-width: 100%;
-        margin: 10px 0;
-    }
-    .post-content h2 { margin-top: 1.5rem; font-weight: bold; }
-    .post-content h3 { margin-top: 1.2rem; font-weight: bold; }
-    .post-content p { line-height: 1.6; margin-bottom: 1rem; font-size: 1.1rem; color: #333; }
-    .post-content ul, .post-content ol { margin-bottom: 1rem; padding-left: 20px; }
+    .post-content img { max-width: 100%; height: auto !important; border-radius: 8px; margin: 1.5rem 0; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    .post-content h2 { font-size: 1.75rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: #1e293b; }
+    .post-content h3 { font-size: 1.5rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 1rem; color: #334155; }
+    .post-content p { margin-bottom: 1.25rem; color: #475569; }
+    .post-content ul, .post-content ol { padding-left: 1.5rem; margin-bottom: 1.5rem; }
+    .post-content blockquote { border-left: 4px solid #cbd5e1; padding-left: 1rem; color: #64748b; font-style: italic; margin: 1.5rem 0; }
 </style>
 </body>
 </html>

@@ -3,6 +3,37 @@
 
 <head th:insert="~{layouts/dashboard/head :: head}"></head>
 
+<style>
+    .chart-wrapper {
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        /* Bỏ height: 100% ở đây để tránh lỗi flexbox kéo dãn */
+        border: 1px solid #e9ecef;
+        display: flex;
+        flex-direction: column;
+    }
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #495057;
+        margin: 0;
+    }
+    /* Class mới để cố định chiều cao khung chứa Canvas */
+    .chart-canvas-container {
+        position: relative;
+        width: 100%;
+        flex-grow: 1;
+    }
+</style>
+
 <body class="admin-layout">
 <div class="layout-wrapper">
     <aside th:insert="~{layouts/dashboard/sidebar :: nav}"></aside>
@@ -16,11 +47,9 @@
                 <p class="page-subtitle">Tổng quan thống kê hệ thống</p>
             </div>
 
-            <div class="stat-cards">
+            <div class="stat-cards animate__animated animate__fadeInUp">
                 <div class="stat-card bg-primary">
-                    <div class="stat-icon">
-                        <i class="fas fa-newspaper"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-newspaper"></i></div>
                     <div class="stat-content">
                         <span class="stat-label">Tổng bài viết</span>
                         <h3 class="stat-value" th:text="${totalPosts}">0</h3>
@@ -28,9 +57,7 @@
                 </div>
 
                 <div class="stat-card bg-warning">
-                    <div class="stat-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-envelope"></i></div>
                     <div class="stat-content">
                         <span class="stat-label">Liên hệ mới</span>
                         <h3 class="stat-value" th:text="${newContacts}">0</h3>
@@ -38,9 +65,7 @@
                 </div>
 
                 <div class="stat-card bg-success">
-                    <div class="stat-icon">
-                        <i class="fas fa-project-diagram"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-project-diagram"></i></div>
                     <div class="stat-content">
                         <span class="stat-label">Dự án hoạt động</span>
                         <h3 class="stat-value" th:text="${activeProjects}">0</h3>
@@ -48,9 +73,7 @@
                 </div>
 
                 <div class="stat-card bg-info">
-                    <div class="stat-icon">
-                        <i class="fas fa-eye"></i>
-                    </div>
+                    <div class="stat-icon"><i class="fas fa-eye"></i></div>
                     <div class="stat-content">
                         <span class="stat-label">Tổng lượt truy cập</span>
                         <h3 class="stat-value" th:text="${totalViews}">0</h3>
@@ -58,18 +81,55 @@
                 </div>
             </div>
 
-            <div class="card mt-4">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h5 class="card-title mb-0">Liên hệ mới nhất</h5>
+            <div class="row g-4 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.1s;">
+                <div class="col-lg-8">
+                    <div class="chart-wrapper">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-chart-line me-2 text-primary"></i>Lượt truy cập năm nay</h5>
+                        </div>
+                        <div class="chart-canvas-container" style="height: 300px;">
+                            <canvas id="trafficChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="chart-wrapper">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-chart-pie me-2 text-warning"></i>Trạng thái liên hệ</h5>
+                        </div>
+                        <div class="chart-canvas-container" style="height: 250px; display: flex; justify-content: center;">
+                            <canvas id="contactChart"></canvas>
+                        </div>
+                        <p class="text-center text-muted small mt-3">Tỷ lệ xử lý yêu cầu khách hàng</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-4 animate__animated animate__fadeInUp" style="animation-delay: 0.2s;">
+                <div class="col-12">
+                    <div class="chart-wrapper">
+                        <div class="chart-header">
+                            <h5 class="chart-title"><i class="fas fa-chart-bar me-2 text-success"></i>Tăng trưởng nội dung mới</h5>
+                        </div>
+                        <div class="chart-canvas-container" style="height: 300px;">
+                            <canvas id="contentChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card mt-4 border-0 shadow-sm animate__animated animate__fadeInUp" style="animation-delay: 0.3s;">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+                    <h5 class="card-title mb-0 fw-bold">Liên hệ mới nhất</h5>
                     <a th:href="@{/admin/contacts}" class="btn btn-sm btn-outline-primary">Xem tất cả</a>
                 </div>
                 <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
+                    <table class="table table-hover mb-0 align-middle">
+                        <thead class="bg-light">
                         <tr>
                             <th>Họ tên</th>
-                            <th>Điện thoại</th>
-                            <th>Email</th>
+                            <th>Thông tin</th>
                             <th>Chủ đề</th>
                             <th>Trạng thái</th>
                             <th>Hành động</th>
@@ -77,22 +137,26 @@
                         </thead>
                         <tbody>
                         <tr th:if="${#lists.isEmpty(recentContacts)}">
-                            <td colspan="6" class="text-center py-3">Chưa có liên hệ nào.</td>
+                            <td colspan="5" class="text-center py-4 text-muted">Chưa có liên hệ nào.</td>
                         </tr>
 
                         <tr th:each="contact : ${recentContacts}">
-                            <td th:text="${contact.fullName}">Tên khách</td>
-                            <td th:text="${contact.phone}">0912345678</td>
-                            <td th:text="${contact.email}">email@example.com</td>
+                            <td class="fw-bold" th:text="${contact.fullName}">Tên khách</td>
+                            <td>
+                                <div class="small"><i class="fas fa-phone-alt text-muted me-1"></i> <span th:text="${contact.phone}"></span></div>
+                                <div class="small"><i class="fas fa-envelope text-muted me-1"></i> <span th:text="${contact.email}"></span></div>
+                            </td>
                             <td th:text="${contact.subject}">Chủ đề</td>
                             <td>
-                                        <span th:classappend="${'badge-status-' + contact.status.toString().toLowerCase()}"
-                                              class="badge" th:text="${contact.status}">NEW</span>
+                                <span class="badge"
+                                      th:classappend="${contact.status.name() == 'NEW' ? 'bg-danger' :
+                                                       (contact.status.name() == 'PROCESSING' ? 'bg-warning text-dark' : 'bg-success')}"
+                                      th:text="${contact.status}">NEW</span>
                             </td>
                             <td>
-                                <a th:href="@{/admin/contacts/{id}(id=${contact.id})}"
-                                   class="btn btn-sm btn-info text-white" title="Xem chi tiết">
-                                    <i class="fas fa-eye"></i>
+                                <a th:href="@{/admin/contacts/edit/{id}(id=${contact.id})}"
+                                   class="btn btn-sm btn-light text-primary" title="Xem chi tiết">
+                                    <i class="fas fa-arrow-right"></i>
                                 </a>
                             </td>
                         </tr>
@@ -105,6 +169,121 @@
 </div>
 
 <div th:insert="~{layouts/dashboard/scripts :: scripts}"></div>
-</body>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script th:inline="javascript">
+    document.addEventListener("DOMContentLoaded", function () {
+        // --- Hứng dữ liệu từ Model (Thymeleaf) ---
+        const trafficLabels = /*[[${trafficLabels}]]*/ ['T1', 'T2', 'T3'];
+        const trafficData = /*[[${trafficData}]]*/ [0, 0, 0];
+
+        const contactData = /*[[${contactStatusData}]]*/ [0, 0, 0];
+
+        const postsGrowth = /*[[${postsGrowth}]]*/ [0, 0, 0];
+        const coursesGrowth = /*[[${coursesGrowth}]]*/ [0, 0, 0];
+
+        // --- Cấu hình màu sắc ---
+        const colors = {
+            primary: '#003366',
+            accent: '#ff6600',
+            success: '#28a745',
+            warning: '#ffc107',
+            danger: '#dc3545',
+            info: '#17a2b8'
+        };
+
+        // 1. Line Chart: Traffic
+        const trafficCtx = document.getElementById('trafficChart').getContext('2d');
+        new Chart(trafficCtx, {
+            type: 'line',
+            data: {
+                labels: trafficLabels,
+                datasets: [{
+                    label: 'Lượt truy cập',
+                    data: trafficData,
+                    borderColor: colors.primary,
+                    backgroundColor: 'rgba(0, 51, 102, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#fff',
+                    pointBorderColor: colors.accent,
+                    pointRadius: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false, // Quan trọng: False để nó theo thẻ cha
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+
+        // 2. Doughnut Chart: Contact Status
+        const contactCtx = document.getElementById('contactChart').getContext('2d');
+        new Chart(contactCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Mới', 'Đang xử lý', 'Hoàn thành'],
+                datasets: [{
+                    data: contactData,
+                    backgroundColor: [colors.danger, colors.warning, colors.success],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { usePointStyle: true, padding: 20 }
+                    }
+                }
+            }
+        });
+
+        // 3. Bar Chart: Content Growth
+        const contentCtx = document.getElementById('contentChart').getContext('2d');
+        new Chart(contentCtx, {
+            type: 'bar',
+            data: {
+                labels: trafficLabels,
+                datasets: [
+                    {
+                        label: 'Bài viết mới',
+                        data: postsGrowth,
+                        backgroundColor: colors.primary,
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    },
+                    {
+                        label: 'Khóa học mới',
+                        data: coursesGrowth,
+                        backgroundColor: colors.accent,
+                        borderRadius: 4,
+                        barPercentage: 0.6
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top', align: 'end' } },
+                scales: {
+                    y: { beginAtZero: true, grid: { borderDash: [2, 4] } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
 </html>
