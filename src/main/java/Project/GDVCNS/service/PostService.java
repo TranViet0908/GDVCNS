@@ -46,13 +46,10 @@ public class PostService {
     // --- TẠO BÀI VIẾT MỚI ---
     @Transactional
     public void createPost(PostDTO dto) {
-        User currentUser = getCurrentUser(); // <--- Đã fix: Tìm theo username hoặc email
-
+        User currentUser = getCurrentUser();
         Post post = postMapper.toEntity(dto);
         post.setAuthor(currentUser);
         post.setCreatedAt(LocalDateTime.now());
-
-        // Tạo Slug chuẩn (Dùng SlugUtils để không bị lỗi 'vit-nam')
         post.setSlug(generateUniqueSlug(dto.getTitle()));
 
         if (dto.getCategoryId() != null) {
@@ -60,15 +57,14 @@ public class PostService {
             post.setCategory(category);
         }
 
-        // --- PHÂN QUYỀN TRẠNG THÁI ---
-        // Admin: Được quyền chọn mọi trạng thái
-        // Editor: Tạo mới auto là PENDING (Chờ duyệt)
+        // Logic trạng thái
         if (currentUser.getRole() == UserRole.ADMIN) {
             post.setStatus(dto.getStatus() != null ? dto.getStatus() : PostStatus.PUBLISHED);
         } else {
             post.setStatus(PostStatus.PENDING);
         }
 
+        // [FIX CHẮC CHẮN] Nếu trạng thái là PUBLISHED, bắt buộc set ngày đăng
         if (post.getStatus() == PostStatus.PUBLISHED) {
             post.setPublishedAt(LocalDateTime.now());
         }
@@ -82,8 +78,7 @@ public class PostService {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy bài viết"));
 
-        checkPermission(post); // <--- Admin qua, Editor check chính chủ
-
+        checkPermission(post);
         User currentUser = getCurrentUser();
 
         post.setTitle(dto.getTitle());
@@ -97,22 +92,27 @@ public class PostService {
             post.setCategory(category);
         }
 
-        // --- PHÂN QUYỀN TRẠNG THÁI KHI UPDATE ---
+        PostStatus oldStatus = post.getStatus();
+        PostStatus newStatus = dto.getStatus();
+
         if (currentUser.getRole() == UserRole.ADMIN) {
-            post.setStatus(dto.getStatus());
+            post.setStatus(newStatus);
         } else {
-            // Editor: Không được tự ý Publish bài.
-            // Nếu bài đang Published mà sửa -> Về Pending
-            // Nếu bài đang Pending/Draft -> Giữ nguyên trạng thái gửi lên
-            if (post.getStatus() == PostStatus.PUBLISHED || dto.getStatus() == PostStatus.PUBLISHED) {
+            if (oldStatus == PostStatus.PUBLISHED || newStatus == PostStatus.PUBLISHED) {
                 post.setStatus(PostStatus.PENDING);
             } else {
-                post.setStatus(dto.getStatus());
+                post.setStatus(newStatus);
             }
         }
 
-        // Cập nhật Slug nếu tiêu đề đổi (Optional)
-        // if(!post.getTitle().equals(dto.getTitle())) post.setSlug(generateUniqueSlug(dto.getTitle()));
+        // [FIX CHẮC CHẮN] Logic cập nhật ngày đăng
+        // 1. Nếu chuyển sang PUBLISHED
+        // 2. Hoặc đang là PUBLISHED nhưng ngày đăng bị Null (sửa lỗi dữ liệu cũ)
+        if (post.getStatus() == PostStatus.PUBLISHED) {
+            if (oldStatus != PostStatus.PUBLISHED || post.getPublishedAt() == null) {
+                post.setPublishedAt(LocalDateTime.now());
+            }
+        }
 
         post.setUpdatedAt(LocalDateTime.now());
         postRepository.save(post);
@@ -209,11 +209,11 @@ public class PostService {
     // Hàm này hoàn toàn độc lập với getCurrentUser, nên PublicController chạy bao mượt
     @Transactional(readOnly = true)
     public Page<PostDTO> getPostsByCategorySlug(String categorySlug, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+        // [FIX] Đổi Sort.by("publishedAt") thành Sort.by("createdAt")
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
 
         Specification<Post> spec = (root, query, cb) -> {
             List<Predicate> predicates = new ArrayList<>();
-            // Chỉ lấy bài đã Published
             predicates.add(cb.equal(root.get("status"), PostStatus.PUBLISHED));
 
             if (categorySlug != null && !categorySlug.isEmpty()) {

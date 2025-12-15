@@ -251,7 +251,7 @@ a { text-decoration: none; transition: all 0.3s ease; }
     background-color: #0f172a !important; /* Bắt buộc màu tối */
     color: #cbd5e1; /* Màu chữ xám sáng */
     padding: 20px 0 10px;
-    margin-top: auto;
+    margin-top: 20px;
     position: relative;
     z-index: 10;
 }
@@ -524,3 +524,4 @@ a { text-decoration: none; transition: all 0.3s ease; }
 .search-box-wrapper {
     margin-bottom: 2rem;
 }
+

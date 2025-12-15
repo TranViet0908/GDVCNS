@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -43,12 +45,26 @@ public class PublicController {
     private final CategoryRepository categoryRepository;
     private final PostMapper postMapper;
 
+    // --- HÀM HỖ TRỢ LẤY CONFIGS ---
+    private Map<String, String> getGlobalConfigs() {
+        // Vì service đã trả về Map rồi nên lấy dùng luôn
+        return systemConfigService.getAllConfigs();
+    }
+
     // --- TRANG CHỦ ---
     @GetMapping("/")
     public String homePage(Model model) {
+        // [FIX] Sort by createdAt DESC (Mới tạo lên đầu)
         Pageable coursePageable = PageRequest.of(0, 6, Sort.by("createdAt").descending());
+
+        // Bài viết cũng sort theo createdAt DESC
         model.addAttribute("courses", courseService.getCourses(null, coursePageable).getContent());
+
+        // Lưu ý: getLatestPosts trong Service đang dùng hàm getPostsByCategorySlug, ta cần sửa hàm đó trong Service (Bước 4) hoặc sửa trực tiếp ở đây nếu gọi repository.
+        // Để đồng bộ, tôi sẽ sửa hàm getLatestPosts trong PostService ở Bước 4.
         model.addAttribute("posts", postService.getLatestPosts(3).getContent());
+
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         model.addAttribute("pageTitle", "Trang chủ - GDVCNS");
         return "public/index";
     }
@@ -56,7 +72,7 @@ public class PublicController {
     // --- GIỚI THIỆU ---
     @GetMapping("/gioi-thieu")
     public String aboutPage(Model model) {
-        model.addAttribute("configs", systemConfigService.getAllConfigs());
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         model.addAttribute("pageTitle", "Về chúng tôi - GDVCNS");
         return "public/about";
     }
@@ -69,6 +85,7 @@ public class PublicController {
                               @RequestParam(defaultValue = "9") int size,
                               @RequestParam(required = false) String keyword) {
 
+        // [FIX] Sort by createdAt DESC
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Course> coursePage;
 
@@ -83,6 +100,7 @@ public class PublicController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", coursePage.getTotalPages());
         model.addAttribute("pageTitle", "Khóa học & Dịch vụ");
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/courses/list";
     }
 
@@ -94,6 +112,7 @@ public class PublicController {
         Category category = categoryRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
 
+        // [FIX] Sort by createdAt DESC
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<Course> coursePage = courseService.getCoursesByCategorySlug(slug, pageable);
 
@@ -102,6 +121,7 @@ public class PublicController {
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", coursePage.getTotalPages());
         model.addAttribute("pageTitle", category.getName());
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/courses/list";
     }
 
@@ -110,13 +130,12 @@ public class PublicController {
         Course course = courseRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Khóa học không tồn tại"));
 
-        // --- FIX LỖI VIEW COUNT NULL ---
         Long currentView = course.getViewCount() == null ? 0L : course.getViewCount();
         course.setViewCount(currentView + 1);
-        // -------------------------------
-
         courseRepository.save(course);
+
         model.addAttribute("service", course);
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/courses/detail";
     }
 
@@ -129,7 +148,8 @@ public class PublicController {
                            @RequestParam(defaultValue = "10") int size,
                            @RequestParam(required = false) String keyword) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+        // [FIX] Sort by createdAt DESC
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<PostDTO> postPage;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -143,6 +163,7 @@ public class PublicController {
         model.addAttribute("keyword", keyword);
         model.addAttribute("recentNews", postService.getLatestPosts(5).getContent());
         model.addAttribute("pageTitle", "Tin tức & Sự kiện");
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/news/list";
     }
 
@@ -151,16 +172,17 @@ public class PublicController {
                                   Model model,
                                   @RequestParam(defaultValue = "0") int page,
                                   @RequestParam(defaultValue = "10") int size) {
-
         Category category = categoryRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Danh mục không tồn tại"));
 
+        // Hàm này trong service đã được sửa sort theo createdAt (xem Bước 4)
         Page<PostDTO> postPage = postService.getPostsByCategorySlug(slug, page, size);
 
         model.addAttribute("newsList", postPage);
         model.addAttribute("projects", postPage);
         model.addAttribute("recentNews", postService.getLatestPosts(5).getContent());
         model.addAttribute("pageTitle", category.getName());
+        model.addAttribute("globalConfigs", getGlobalConfigs());
 
         if (slug.contains("du-an")) {
             return "public/projects/list";
@@ -173,14 +195,13 @@ public class PublicController {
         Post post = postRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
 
-        // --- FIX LỖI VIEW COUNT NULL ---
         Long currentView = post.getViewCount() == null ? 0L : post.getViewCount();
         post.setViewCount(currentView + 1);
-        // -------------------------------
-
         postRepository.save(post);
+
         model.addAttribute("news", postMapper.toDTO(post));
         model.addAttribute("relatedNews", postService.getLatestPosts(5).getContent());
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/news/detail";
     }
 
@@ -191,7 +212,8 @@ public class PublicController {
                                @RequestParam(defaultValue = "9") int size,
                                @RequestParam(required = false) String keyword) {
 
-        Pageable pageable = PageRequest.of(page, size, Sort.by("publishedAt").descending());
+        // [FIX] createdAt DESC
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         Page<PostDTO> projectPage;
 
         if (keyword != null && !keyword.trim().isEmpty()) {
@@ -204,6 +226,7 @@ public class PublicController {
         model.addAttribute("projects", projectPage);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pageTitle", "Dự án tiêu biểu");
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/projects/list";
     }
 
@@ -212,13 +235,12 @@ public class PublicController {
         Post project = postRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Dự án không tồn tại"));
 
-        // --- FIX LỖI VIEW COUNT NULL ---
         Long currentView = project.getViewCount() == null ? 0L : project.getViewCount();
         project.setViewCount(currentView + 1);
-        // -------------------------------
-
         postRepository.save(project);
+
         model.addAttribute("project", postMapper.toDTO(project));
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/projects/detail";
     }
 
@@ -226,6 +248,7 @@ public class PublicController {
     @GetMapping("/lien-he")
     public String contactPage(Model model) {
         model.addAttribute("pageTitle", "Liên hệ - GDVCNS");
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/contact";
     }
 
@@ -243,11 +266,13 @@ public class PublicController {
 
     @GetMapping("/chinh-sach-bao-mat")
     public String privacyPolicy(Model model) {
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/privacy";
     }
 
     @GetMapping("/dieu-khoan-su-dung")
     public String termsOfService(Model model) {
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/terms";
     }
 
@@ -262,6 +287,7 @@ public class PublicController {
         model.addAttribute("faqList", faqs);
         model.addAttribute("keyword", keyword);
         model.addAttribute("pageTitle", "Câu hỏi thường gặp - GDVCNS");
+        model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/faq";
     }
 }
