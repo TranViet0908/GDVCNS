@@ -12,9 +12,17 @@
         </div>
         <div class="user-details">
             <div class="fw-bold" style="font-size: 13px;"
-                 th:text="${#authentication.principal.user.fullName != null ? #authentication.principal.user.fullName : #authentication.name}">
+                 th:if="${#authentication.principal instanceof T(Project.GDVCNS.security.CustomUserDetails)}"
+                 th:text="${#authentication.principal.fullName}">
                 Admin
             </div>
+
+            <div class="fw-bold" style="font-size: 13px;"
+                 th:unless="${#authentication.principal instanceof T(Project.GDVCNS.security.CustomUserDetails)}"
+                 th:text="${#authentication.name}">
+                Guest
+            </div>
+
             <div class="opacity-75" style="font-size: 11px;">
                 <i class="fas fa-circle text-success" style="font-size: 8px; margin-right: 4px;"></i>Online
             </div>

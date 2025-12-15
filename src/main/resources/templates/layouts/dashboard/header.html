@@ -32,9 +32,17 @@
             <div class="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
                 <div class="profile-info d-none d-md-flex">
                     <span class="profile-name"
-                          th:text="${#authentication.principal.user.fullName != null ? #authentication.principal.user.fullName : #authentication.name}">
+                          th:if="${#authentication.principal instanceof T(Project.GDVCNS.security.CustomUserDetails)}"
+                          th:text="${#authentication.principal.fullName}">
                         Admin
                     </span>
+
+                    <span class="profile-name"
+                          th:unless="${#authentication.principal instanceof T(Project.GDVCNS.security.CustomUserDetails)}"
+                          th:text="${#authentication.name}">
+                        Guest
+                    </span>
+
                     <span class="profile-role" th:text="${#authentication.authorities[0].authority.replace('ROLE_', '')}">ADMIN</span>
                 </div>
 

@@ -23,6 +23,12 @@ public class CustomUserDetails implements UserDetails {
         // Ví dụ: ADMIN -> ROLE_ADMIN
         return Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole().name()));
     }
+    public String getFullName() {
+        if (user != null && user.getFullName() != null) {
+            return user.getFullName();
+        }
+        return user != null ? user.getUsername() : "Admin";
+    }
     // --- [SỬA LẠI: TRẢ VỀ NULL ĐỂ TRÁNH LỖI] ---
     public String getAvatar() {
         return null; // Vì DB không có, ta trả về null luôn
