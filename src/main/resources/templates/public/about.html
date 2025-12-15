@@ -19,7 +19,7 @@
             <div class="col-lg-6 animate-on-scroll">
                 <span class="section-label">Câu chuyện thương hiệu</span>
                 <h2 class="section-heading mb-4">GDVCNS - Tiên Phong & Đổi Mới</h2>
-                <div class="formatted-content text-muted fs-5 lh-base" th:utext="${configs['site_intro']}">
+                <div class="formatted-content text-muted fs-5 lh-base" th:utext="${globalConfigs['site_intro']}">
                 </div>
             </div>
             <div class="col-lg-6 mt-5 mt-lg-0 animate-on-scroll" data-delay="200">
@@ -40,7 +40,7 @@
                             <i class="fas fa-eye fa-2x"></i>
                         </div>
                         <h3 class="fw-bold mb-3">Tầm Nhìn</h3>
-                        <div class="text-muted formatted-content" th:utext="${configs['site_vision']}"></div>
+                        <div class="text-muted formatted-content" th:utext="${globalConfigs['site_vision']}"></div>
                     </div>
                 </div>
             </div>
@@ -51,7 +51,7 @@
                             <i class="fas fa-rocket fa-2x"></i>
                         </div>
                         <h3 class="fw-bold mb-3">Sứ Mệnh</h3>
-                        <div class="text-muted formatted-content" th:utext="${configs['site_mission']}"></div>
+                        <div class="text-muted formatted-content" th:utext="${globalConfigs['site_mission']}"></div>
                     </div>
                 </div>
             </div>
@@ -63,7 +63,7 @@
                 <span class="section-label">Core Values</span>
                 <h2 class="section-heading mb-5">Giá Trị Cốt Lõi</h2>
                 <div class="container" style="max-width: 800px;">
-                    <div class="formatted-content fs-5" th:utext="${configs['site_core_values']}"></div>
+                    <div class="formatted-content fs-5" th:utext="${globalConfigs['site_core_values']}"></div>
                 </div>
             </div>
         </div>
