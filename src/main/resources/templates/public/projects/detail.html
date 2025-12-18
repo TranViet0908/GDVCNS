@@ -32,6 +32,29 @@
                     <div class="project-description formatted-content text-dark" th:utext="${project.content}">
                     </div>
                 </div>
+
+                <div class="mt-5 pt-5" th:if="${not #lists.isEmpty(relatedProjects)}">
+                    <h4 class="fw-bold mb-4 border-start border-4 border-primary ps-3">Dự án tiêu biểu khác</h4>
+                    <div class="row g-4">
+                        <div class="col-md-6" th:each="related : ${relatedProjects}">
+                            <div class="card-modern h-100 d-flex flex-row align-items-center p-3 bg-light rounded-4 border-0 shadow-sm group-hover-parent">
+                                <img th:src="${related.thumbnailUrl != null ? related.thumbnailUrl : 'https://via.placeholder.com/100'}"
+                                     class="rounded-3 me-3 object-fit-cover shadow-sm transition-transform"
+                                     style="width: 100px; height: 80px;" alt="Thumb">
+                                <div>
+                                    <h6 class="mb-1 fw-bold">
+                                        <a th:href="@{/du-an/{slug}(slug=${related.slug})}"
+                                           class="text-decoration-none text-dark hover-accent line-clamp-2"
+                                           th:text="${related.title}">Tên dự án</a>
+                                    </h6>
+                                    <span class="badge bg-white text-muted border rounded-pill fw-normal" style="font-size: 0.7rem;">
+                                        <i class="far fa-calendar-alt me-1"></i> <span th:text="${#temporals.format(related.publishedAt, 'MM/yyyy')}">Date</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="col-lg-4 animate-on-scroll" data-delay="200">

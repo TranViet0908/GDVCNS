@@ -34,4 +34,7 @@ public interface PostRepository extends JpaRepository<Post, Long>, JpaSpecificat
     // [MỚI] Thống kê bài viết mới theo tháng
     @Query("SELECT MONTH(p.createdAt), COUNT(p) FROM Post p WHERE YEAR(p.createdAt) = :year GROUP BY MONTH(p.createdAt)")
     List<Object[]> countPostsByMonth(@Param("year") int year);
+
+    // [MỚI - RECOMMENDATION] Lấy 5 bài viết liên quan cùng danh mục, TRỪ bài hiện tại (excludePostId)
+    List<Post> findTop5ByCategoryIdAndStatusAndIdNotOrderByPublishedAtDesc(Long categoryId, PostStatus status, Long excludePostId);
 }

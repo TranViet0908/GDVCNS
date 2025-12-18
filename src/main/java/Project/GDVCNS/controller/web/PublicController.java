@@ -6,16 +6,16 @@ import Project.GDVCNS.entity.Category;
 import Project.GDVCNS.entity.Course;
 import Project.GDVCNS.entity.Faq;
 import Project.GDVCNS.entity.Post;
+import Project.GDVCNS.enums.ActivityType;
 import Project.GDVCNS.enums.ContactStatus;
+import Project.GDVCNS.enums.PostStatus;
 import Project.GDVCNS.mapper.PostMapper;
 import Project.GDVCNS.repository.CategoryRepository;
 import Project.GDVCNS.repository.CourseRepository;
 import Project.GDVCNS.repository.FaqRepository;
 import Project.GDVCNS.repository.PostRepository;
-import Project.GDVCNS.service.ContactService;
-import Project.GDVCNS.service.CourseService;
-import Project.GDVCNS.service.PostService;
-import Project.GDVCNS.service.SystemConfigService;
+import Project.GDVCNS.service.*;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -39,6 +39,7 @@ public class PublicController {
     private final PostService postService;
     private final ContactService contactService;
     private final FaqRepository faqRepository;
+    private final UserActivityService userActivityService;
 
     private final CourseRepository courseRepository;
     private final PostRepository postRepository;
@@ -126,15 +127,29 @@ public class PublicController {
     }
 
     @GetMapping("/khoa-hoc/{slug}")
-    public String courseDetail(@PathVariable String slug, Model model) {
+    public String courseDetail(@PathVariable String slug, Model model, HttpServletRequest request) {
         Course course = courseRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Khóa học không tồn tại"));
 
+        // 1. Tăng view
         Long currentView = course.getViewCount() == null ? 0L : course.getViewCount();
         course.setViewCount(currentView + 1);
         courseRepository.save(course);
 
+        // 2. [MỚI] Tracking hành vi người dùng
+        userActivityService.logActivity(request, ActivityType.VIEW_COURSE, course.getId());
+
+        // 3. [MỚI] Gợi ý khóa học liên quan (Cùng Category, trừ bài hiện tại)
+        List<Course> relatedCourses = List.of();
+        if (course.getCategory() != null) {
+            relatedCourses = courseRepository.findTop5ByCategoryIdAndIsActiveTrueAndIdNotOrderByCreatedAtDesc(
+                    course.getCategory().getId(),
+                    course.getId()
+            );
+        }
+
         model.addAttribute("service", course);
+        model.addAttribute("relatedCourses", relatedCourses); // Truyền sang View (Cần sửa view detail.html để hiển thị list này nếu muốn)
         model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/courses/detail";
     }
@@ -191,16 +206,34 @@ public class PublicController {
     }
 
     @GetMapping("/tin-tuc/{slug}")
-    public String newsDetail(@PathVariable String slug, Model model) {
+    public String newsDetail(@PathVariable String slug, Model model, HttpServletRequest request) {
         Post post = postRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Bài viết không tồn tại"));
 
+        // 1. Tăng view
         Long currentView = post.getViewCount() == null ? 0L : post.getViewCount();
         post.setViewCount(currentView + 1);
         postRepository.save(post);
 
+        // 2. [MỚI] Tracking hành vi
+        userActivityService.logActivity(request, ActivityType.VIEW_POST, post.getId());
+
+        // 3. [MỚI] Gợi ý bài viết liên quan (Cùng Category, trừ bài hiện tại)
+        List<PostDTO> relatedPostsDTO;
+        if (post.getCategory() != null) {
+            List<Post> relatedPosts = postRepository.findTop5ByCategoryIdAndStatusAndIdNotOrderByPublishedAtDesc(
+                    post.getCategory().getId(),
+                    PostStatus.PUBLISHED,
+                    post.getId()
+            );
+            relatedPostsDTO = relatedPosts.stream().map(postMapper::toDTO).collect(Collectors.toList());
+        } else {
+            // Fallback nếu không có category thì lấy bài mới nhất
+            relatedPostsDTO = postService.getLatestPosts(5).getContent();
+        }
+
         model.addAttribute("news", postMapper.toDTO(post));
-        model.addAttribute("relatedNews", postService.getLatestPosts(5).getContent());
+        model.addAttribute("relatedNews", relatedPostsDTO); // View đã có sẵn vòng lặp relatedNews, giờ nó sẽ chính xác hơn
         model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/news/detail";
     }
@@ -231,15 +264,31 @@ public class PublicController {
     }
 
     @GetMapping("/du-an/{slug}")
-    public String projectDetail(@PathVariable String slug, Model model) {
+    public String projectDetail(@PathVariable String slug, Model model, HttpServletRequest request) {
         Post project = postRepository.findBySlug(slug)
                 .orElseThrow(() -> new RuntimeException("Dự án không tồn tại"));
 
+        // 1. Tăng view
         Long currentView = project.getViewCount() == null ? 0L : project.getViewCount();
         project.setViewCount(currentView + 1);
         postRepository.save(project);
 
+        // 2. [MỚI] Tracking hành vi (Dự án cũng là Post nhưng category khác)
+        userActivityService.logActivity(request, ActivityType.VIEW_POST, project.getId());
+
+        // 3. [MỚI] Gợi ý dự án liên quan
+        List<PostDTO> relatedProjectsDTO = List.of();
+        if (project.getCategory() != null) {
+            List<Post> relatedProjects = postRepository.findTop5ByCategoryIdAndStatusAndIdNotOrderByPublishedAtDesc(
+                    project.getCategory().getId(),
+                    PostStatus.PUBLISHED,
+                    project.getId()
+            );
+            relatedProjectsDTO = relatedProjects.stream().map(postMapper::toDTO).collect(Collectors.toList());
+        }
+
         model.addAttribute("project", postMapper.toDTO(project));
+        model.addAttribute("relatedProjects", relatedProjectsDTO); // Cần sửa view detail dự án để hiển thị nếu muốn
         model.addAttribute("globalConfigs", getGlobalConfigs());
         return "public/projects/detail";
     }
